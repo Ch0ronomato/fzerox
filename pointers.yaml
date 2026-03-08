@@ -1,0 +1,97 @@
+# Pointer policies for main race overlay
+# Policies:
+#   PTR_LEAVE_AS_IS  - don't touch on restore (rodata/static tables/function pointers)
+#   PTR_RESTORE_REF  - restore as relocatable reference (arena/span + offset)
+#   PTR_SET_NULL     - force NULL on restore
+#   PTR_RECOMPUTE    - rebuild via post-restore hook / init logic
+
+pointers:
+  # --- Function pointer tables (static) ---
+  sGamemodeInitFuncs: PTR_LEAVE_AS_IS
+  sGamemodeUpdateFuncs: PTR_LEAVE_AS_IS
+  sGamemodeDrawFuncs: PTR_LEAVE_AS_IS
+  sCourseDecorationDrawFuncs: PTR_LEAVE_AS_IS
+  sMachineLoadTexturesFuncs: PTR_LEAVE_AS_IS
+  sMachineDrawFuncs: PTR_LEAVE_AS_IS
+  D_800CF4B8: PTR_LEAVE_AS_IS
+  sBackwardChunkGroupDrawFuncs: PTR_LEAVE_AS_IS
+  sForwardChunkGroupDrawFuncs: PTR_LEAVE_AS_IS
+  sCharacterBehaviorFuncs: PTR_LEAVE_AS_IS
+
+  # --- Static pointer-to-static-struct / init-data tables ---
+  sCourseVenueFloors: PTR_LEAVE_AS_IS
+  sCourseSkyboxes: PTR_LEAVE_AS_IS
+  sBackgroundSpriteCourseInitData: PTR_LEAVE_AS_IS
+  D_800CF8C8: PTR_LEAVE_AS_IS
+  D_800CDD38: PTR_LEAVE_AS_IS
+
+  # --- Font / texture-info tables (static) ---
+  sSpinningKeyboardCharacterCompTexInfo: PTR_LEAVE_AS_IS
+  sFont1CompTexInfos: PTR_LEAVE_AS_IS
+  sFont2CompTexInfos: PTR_LEAVE_AS_IS
+  sFont3CompTexInfos: PTR_LEAVE_AS_IS
+  sFont4CompTexInfos: PTR_LEAVE_AS_IS
+  sFont5CompTexInfos: PTR_LEAVE_AS_IS
+  sFont6CompTexInfos: PTR_LEAVE_AS_IS
+  sMachineStatValueCompTexInfos: PTR_LEAVE_AS_IS
+  sMachineWeightDigitCompTexInfos: PTR_LEAVE_AS_IS
+
+  # --- Const string / const table pointers (static) ---
+  gDifficultyNames: PTR_LEAVE_AS_IS
+  sCharacterNames: PTR_LEAVE_AS_IS
+  sTrackNames: PTR_LEAVE_AS_IS
+  gMachineNames: PTR_LEAVE_AS_IS
+  sCameraScissorBoxTypes: PTR_LEAVE_AS_IS
+
+  # --- Runtime pointers (prefer relocatable restore) ---
+  gCurAudioTask: PTR_RESTORE_REF
+  D_800E12C0: PTR_RESTORE_REF
+  sTerrainEffectVtxStart: PTR_RESTORE_REF
+
+  sLastRacer: PTR_RESTORE_REF
+  sRivalRacer: PTR_RESTORE_REF
+  sPlayerRacer: PTR_RESTORE_REF
+
+  gEffectsVtxPtr: PTR_RESTORE_REF
+  gEffectsVtxEndPtr: PTR_RESTORE_REF
+  gCourseVtxPtr: PTR_RESTORE_REF
+
+  gRacersByPosition: PTR_RESTORE_REF
+
+  sPipeFogColors: PTR_RESTORE_REF
+  sTunnelFogColors: PTR_RESTORE_REF
+
+  gFastestGhost: PTR_RESTORE_REF
+  gFastestGhostRacer: PTR_RESTORE_REF
+  sFastestGhostRacerRacer: PTR_RESTORE_REF
+  sGhostReplayRecordingPtr: PTR_RESTORE_REF
+
+  gCurrentCourseInfo: PTR_RESTORE_REF
+  sLastSegmentChunk: PTR_RESTORE_REF
+  sCourseDisp: PTR_RESTORE_REF
+  D_800F89B8: PTR_RESTORE_REF
+  D_800F89BC: PTR_RESTORE_REF
+  D_800F89C8: PTR_RESTORE_REF
+  sWorkingSegmentChunk: PTR_RESTORE_REF
+  sWorkingNextSegmentChunk: PTR_RESTORE_REF
+
+  sTransitionPalettePtr: PTR_RESTORE_REF
+
+  # Menus: runtime texture/palette buffers
+  sRetireTexture: PTR_RESTORE_REF
+  sRetirePalette: PTR_RESTORE_REF
+  sWinnerTexture: PTR_RESTORE_REF
+  sWinnerPalette: PTR_RESTORE_REF
+  sLoserTexture: PTR_RESTORE_REF
+  sLoserPalette: PTR_RESTORE_REF
+
+  # --- Device/OS handles / special cases ---
+  gSramPiHandlePtr: PTR_RECOMPUTE
+
+  # --- Derived presentation state (rebuild instead of restoring raw pointers) ---
+  gCurrentTrackName: PTR_RECOMPUTE
+  gTrackNames: PTR_RECOMPUTE
+
+  # --- Mostly-null/unused ---
+  sUnusedHandler: PTR_LEAVE_AS_IS
+  D_i3_8013DBE8: PTR_RESTORE_REF
