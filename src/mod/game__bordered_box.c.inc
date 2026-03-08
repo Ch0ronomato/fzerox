@@ -1,4 +1,4 @@
-extern s32 sBorderedBoxCount;
+extern long sBorderedBoxCount;
 extern struct BorderedBoxWidget sBorderedBoxes[3];
 static u32 game__bordered_box__save(u8* out, u32 off)
 {

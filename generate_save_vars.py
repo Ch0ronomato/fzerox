@@ -13,6 +13,19 @@ with open("pointers.yaml") as f:
     pointers = yaml.safe_load(f)
 
 
+def _collect_array_dims(t):
+    """Return (base_type, dims) where dims is [d0, d1, ...] in declarator order."""
+    dims = []
+    cur = t.get_canonical()
+
+    while cur.kind in (clang.cindex.TypeKind.CONSTANTARRAY, clang.cindex.TypeKind.INCOMPLETEARRAY, clang.cindex.TypeKind.VARIABLEARRAY):
+        n = cur.get_array_size()  # -1 for incomplete
+        dims.append(n)
+        cur = cur.get_array_element_type().get_canonical()
+
+    return cur, dims  # cur is base element type
+
+
 @dataclass(frozen=True, order=True)
 class GameState:
     File: str
@@ -60,51 +73,41 @@ class GameState:
     # -------------------------
     # extern emission
     # -------------------------
-
     @property
     def extern(self) -> str:
-        """
-        Emit correct C89 extern declaration.
-        """
-
-        t = self._type
+        t = self._type.get_canonical()
         name = self.Name
 
-        # Function pointer arrays must preserve full spelling.
-        if self.is_function_pointer and self.is_array:
-            # Use original type spelling safely.
-            # Example: Gfx *(*[22])(Gfx *)
-            # We rewrite to: extern Gfx *(*name[22])(Gfx *);
-            type_spelling = t.spelling
+        # Array case: rebuild declarator correctly, including multi-d arrays
+        if t.kind in (clang.cindex.TypeKind.CONSTANTARRAY, clang.cindex.TypeKind.INCOMPLETEARRAY, clang.cindex.TypeKind.VARIABLEARRAY):
+            base, dims = _collect_array_dims(t)
 
-            # Replace anonymous array with named one
-            # clang gives something like:
-            # "Gfx *(*[22])(Gfx *)"
-            # We inject name before [22]
-            bracket_index = type_spelling.find('[')
-            if bracket_index != -1:
-                rewritten = (
-                    type_spelling[:bracket_index]
-                    + name
-                    + type_spelling[bracket_index:]
-                )
-                return f"extern {rewritten};"
+            # Replace unknown dims (-1) if possible (only for the first incomplete layer).
+            # NOTE: For true incomplete like `int x[]`, clang gives INCOMPLETEARRAY for the outermost.
+            # If you computed Size, we can infer that outer count from Size/sizeof(element) ONLY if exactly 1 incomplete layer.
+            if -1 in dims:
+                # Only attempt inference if exactly one -1 and we can size base.
+                if dims.count(-1) == 1:
+                    idx = dims.index(-1)
+                    base_size = base.get_size()
+                    if base_size > 0:
+                        # bytes per element includes any remaining inner dimensions already folded into base
+                        # (because base is after peeling all array layers)
+                        inferred = self.Size // base_size
+                        dims[idx] = inferred
 
-        # Arrays
-        if self.is_array:
-            elem_type = self._canonical.get_array_element_type()
-            count = self._canonical.get_array_size()
+            # Build `name[dim0][dim1]...`
+            decl = name
+            for d in dims:
+                if d is None or d < 0:
+                    decl += "[]"
+                else:
+                    decl += f"[{d}]"
 
-            # If incomplete array, fallback to size/sizeof element
-            if count < 0:
-                count = self.Size // elem_type.get_size()
+            return f"extern {base.spelling} {decl};"
 
-            type_spelling = elem_type.spelling
-            return f"extern {type_spelling} {name}[{count}];"
-
-        # Scalar or pointer
+        # Non-array: simple
         return f"extern {t.spelling} {name};"
-
     # -------------------------
     # save emission
     # -------------------------

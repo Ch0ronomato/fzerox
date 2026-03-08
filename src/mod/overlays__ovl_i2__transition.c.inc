@@ -1,18 +1,18 @@
-extern s16 D_i2_80106DA0;
+extern short D_i2_80106DA0;
 extern Gfx D_i2_80106DB8[1];
-extern s32 gTransitionState;
+extern long gTransitionState;
 extern long kTransitionRandomSelection[7];
-extern f32 sStripMoveSpeed;
+extern float sStripMoveSpeed;
 extern long sSurroundingTileSkipChanceMask[8];
 extern short sSurroundingTilesRelativeIndex[8];
-extern u16 sTiledPerspectiveScale;
-extern Transition sTransition;
-extern s16 sTransitionIntermediateFillBlack;
+extern unsigned short sTiledPerspectiveScale;
+extern struct Transition sTransition;
+extern short sTransitionIntermediateFillBlack;
 extern unsigned short sTransitionPalette[32];
-extern u16 * sTransitionPalettePtr;
-extern s16 sTransitionTypeArgument;
-extern s16 sTransitionTypeWithArgument;
-extern s16 sWipePos;
+extern unsigned short * sTransitionPalettePtr;
+extern short sTransitionTypeArgument;
+extern short sTransitionTypeWithArgument;
+extern short sWipePos;
 static u32 overlays__ovl_i2__transition__save(u8* out, u32 off)
 {
 	off = mod_write_bytes(out, off, &D_i2_80106DA0, 2);

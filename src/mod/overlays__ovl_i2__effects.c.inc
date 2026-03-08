@@ -1,24 +1,24 @@
-extern s32 gCollisionSparkCount;
-extern s32 gCollisionSparkIndex;
+extern long gCollisionSparkCount;
+extern long gCollisionSparkIndex;
 extern struct MachineEffect gCollisionSparks[32];
 extern struct MachineEffect gExplosions1[32];
-extern s32 gExplosions1Count;
-extern s32 gExplosions1Index;
+extern long gExplosions1Count;
+extern long gExplosions1Index;
 extern struct MachineEffect gExplosions2[8];
-extern s32 gExplosions2Count;
-extern s32 gExplosions2Index;
+extern long gExplosions2Count;
+extern long gExplosions2Index;
 extern struct FallExplosionEffect gFallExplosions[32];
-extern s32 gFallExplosionsCount;
-extern s32 gFallExplosionsIndex;
+extern long gFallExplosionsCount;
+extern long gFallExplosionsIndex;
 extern struct FlyingSparkEffect gFlyingSparks[32];
-extern s32 gFlyingSparksCount;
-extern s32 gFlyingSparksIndex;
+extern long gFlyingSparksCount;
+extern long gFlyingSparksIndex;
 extern struct MachineDebrisEffect gMachineDebris[128];
-extern s32 gMachineDebrisCount;
-extern s32 gMachineDebrisIndex;
+extern long gMachineDebrisCount;
+extern long gMachineDebrisIndex;
 extern struct MachineEffect gSmokes[32];
-extern s32 gSmokesCount;
-extern s32 gSmokesIndex;
+extern long gSmokesCount;
+extern long gSmokesIndex;
 static u32 overlays__ovl_i2__effects__save(u8* out, u32 off)
 {
 	off = mod_write_bytes(out, off, &gCollisionSparkCount, 4);

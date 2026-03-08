@@ -71,12 +71,12 @@ extern char D_800D10C4[25];
 extern char D_800D10E0[25];
 extern char D_800D10FC[15];
 extern char D_800D110C[24];
-extern s32 D_800F8AB4;
-extern s32 D_800F8AB8;
+extern long D_800F8AB4;
+extern long D_800F8AB8;
 extern signed char D_800F8ABC[48];
-extern bool gAudioContextInitialized;
+extern int gAudioContextInitialized;
 extern AudioSlowLoadBuffer gSlowLoads;
-extern DmaHandler sDmaHandler;
+extern long (*)(struct OSPiHandle_s *, OSIoMesg *, long) sDmaHandler;
 static u32 audio__rom__lib__load__save(u8* out, u32 off)
 {
 	off = mod_write_bytes(out, off, D_800D0AC8, 27);

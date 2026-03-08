@@ -1,4 +1,4 @@
-extern s32 D_i2_80106F10;
+extern long D_i2_80106F10;
 extern unsigned char D_i2_80106F14[24];
 extern unsigned char D_i2_80106F2C[11];
 static u32 overlays__ovl_i2__race__save(u8* out, u32 off)

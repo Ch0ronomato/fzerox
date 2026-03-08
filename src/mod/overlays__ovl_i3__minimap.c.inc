@@ -1,7 +1,7 @@
 extern long gPlayerMinimapLapCounterToggle[4];
 extern unsigned short sCourseMinimapPalette[4];
 extern unsigned char sCourseMinimapTex[4096];
-extern long[4][2] sPlayerMinimapPositions[4];
+extern long sPlayerMinimapPositions[4][4][2];
 static u32 overlays__ovl_i3__minimap__save(u8* out, u32 off)
 {
 	off = mod_write_bytes(out, off, gPlayerMinimapLapCounterToggle, 32);

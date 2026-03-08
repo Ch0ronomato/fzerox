@@ -1,24 +1,24 @@
-extern s32 D_800CD1E8;
-extern s32 D_800CD21C;
+extern long D_800CD1E8;
+extern long D_800CD21C;
 extern long D_800CD220[11];
 extern long D_800CD24C[19];
-extern OSMesg D_800E12B0;
+extern void * D_800E12B0;
 extern signed char D_800E12B8[8];
-extern CourseEffectsInfo * D_800E12C0;
+extern struct CourseEffectsInfo * D_800E12C0;
 extern signed char D_800E12C4[4];
 extern long D_800E12C8[2048];
-extern s32 D_800E32CC;
+extern long D_800E32CC;
 extern char devrostr0[47];
 extern char devrostr1[32];
 extern char devrostr2[22];
 extern char devrostr3[24];
 extern char devrostr4[15];
 extern char devrostr5[10];
-extern bool gInCourseEditor;
-extern s32 sCourseDecorationTextureLoadState;
-extern f32 sDashArrowPointScale;
-extern f32 sDashScaleForward;
-extern f32 sDashScaleWidth;
+extern int gInCourseEditor;
+extern long sCourseDecorationTextureLoadState;
+extern float sDashArrowPointScale;
+extern float sDashScaleForward;
+extern float sDashScaleWidth;
 extern Vtx * sTerrainEffectVtxStart;
 static u32 game__course_gadgets__save(u8* out, u32 off)
 {

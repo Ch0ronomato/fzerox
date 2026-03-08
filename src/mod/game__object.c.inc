@@ -1,5 +1,5 @@
 extern struct unk_800E33E0 D_800E33E0[200];
-extern s32 D_800E3A20;
+extern long D_800E3A20;
 extern struct unk_800E3F28 D_800E3F28[16];
 extern struct unk_800E4068 D_800E4068[16];
 extern struct Object gObjects[32];
