@@ -265,7 +265,7 @@ with open("src/mod/save_runner.c.inc", "w") as f:
     includes = []
     calls = []
     for k, vars in itertools.groupby(sorted(usage), key=operator.attrgetter("File")):
-        includes.append(f"#include \"mod/{k}.c.inc\"")
+        includes.append(f"#include \"src/mod/{k}.c.inc\"")
         calls.append(f"off = {k}__save(out, off);")
     f.write("\n".join(includes))
     f.write("\nu32 global_write(u8* out, u32 off)")
