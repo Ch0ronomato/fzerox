@@ -1,0 +1,48 @@
+extern s32 D_800CD1E8;
+extern s32 D_800CD21C;
+extern long D_800CD220[11];
+extern long D_800CD24C[19];
+extern OSMesg D_800E12B0;
+extern signed char D_800E12B8[8];
+extern CourseEffectsInfo * D_800E12C0;
+extern signed char D_800E12C4[4];
+extern long D_800E12C8[2048];
+extern s32 D_800E32CC;
+extern char devrostr0[47];
+extern char devrostr1[32];
+extern char devrostr2[22];
+extern char devrostr3[24];
+extern char devrostr4[15];
+extern char devrostr5[10];
+extern bool gInCourseEditor;
+extern s32 sCourseDecorationTextureLoadState;
+extern f32 sDashArrowPointScale;
+extern f32 sDashScaleForward;
+extern f32 sDashScaleWidth;
+extern Vtx * sTerrainEffectVtxStart;
+static u32 game__course_gadgets__save(u8* out, u32 off)
+{
+	off = mod_write_bytes(out, off, &D_800CD1E8, 4);
+	off = mod_write_bytes(out, off, &D_800CD21C, 4);
+	off = mod_write_bytes(out, off, D_800CD220, 88);
+	off = mod_write_bytes(out, off, D_800CD24C, 152);
+	off = mod_write_bytes(out, off, &D_800E12B0, 8);
+	off = mod_write_bytes(out, off, D_800E12B8, 8);
+	off = mod_write_bytes(out, off, &D_800E12C0, 8);
+	off = mod_write_bytes(out, off, D_800E12C4, 4);
+	off = mod_write_bytes(out, off, D_800E12C8, 16384);
+	off = mod_write_bytes(out, off, &D_800E32CC, 4);
+	off = mod_write_bytes(out, off, devrostr0, 47);
+	off = mod_write_bytes(out, off, devrostr1, 32);
+	off = mod_write_bytes(out, off, devrostr2, 22);
+	off = mod_write_bytes(out, off, devrostr3, 24);
+	off = mod_write_bytes(out, off, devrostr4, 15);
+	off = mod_write_bytes(out, off, devrostr5, 10);
+	off = mod_write_bytes(out, off, &gInCourseEditor, 4);
+	off = mod_write_bytes(out, off, &sCourseDecorationTextureLoadState, 4);
+	off = mod_write_bytes(out, off, &sDashArrowPointScale, 4);
+	off = mod_write_bytes(out, off, &sDashScaleForward, 4);
+	off = mod_write_bytes(out, off, &sDashScaleWidth, 4);
+	off = mod_write_bytes(out, off, &sTerrainEffectVtxStart, 8);
+	return off;
+}

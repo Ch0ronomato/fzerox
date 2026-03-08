@@ -1,0 +1,42 @@
+extern char D_800D08B0[40];
+extern char D_800D08D8[14];
+extern char D_800D08E8[21];
+extern char D_800D0900[16];
+extern char D_800D0910[33];
+extern char D_800D0934[41];
+extern char D_800D0960[25];
+extern char D_800D097C[8];
+extern char D_800D0984[18];
+extern char D_800D0998[17];
+extern char D_800D09AC[29];
+extern char D_800D09CC[29];
+extern char D_800D09EC[8];
+extern char D_800D09F4[55];
+extern char D_800D0A2C[33];
+extern char D_800D0A50[31];
+extern char D_800D0A70[39];
+extern char D_800D0A98[25];
+extern unsigned char sSeqInstructionArgsTable[80];
+static u32 audio__rom__lib__seqplayer__save(u8* out, u32 off)
+{
+	off = mod_write_bytes(out, off, D_800D08B0, 40);
+	off = mod_write_bytes(out, off, D_800D08D8, 14);
+	off = mod_write_bytes(out, off, D_800D08E8, 21);
+	off = mod_write_bytes(out, off, D_800D0900, 16);
+	off = mod_write_bytes(out, off, D_800D0910, 33);
+	off = mod_write_bytes(out, off, D_800D0934, 41);
+	off = mod_write_bytes(out, off, D_800D0960, 25);
+	off = mod_write_bytes(out, off, D_800D097C, 8);
+	off = mod_write_bytes(out, off, D_800D0984, 18);
+	off = mod_write_bytes(out, off, D_800D0998, 17);
+	off = mod_write_bytes(out, off, D_800D09AC, 29);
+	off = mod_write_bytes(out, off, D_800D09CC, 29);
+	off = mod_write_bytes(out, off, D_800D09EC, 8);
+	off = mod_write_bytes(out, off, D_800D09F4, 55);
+	off = mod_write_bytes(out, off, D_800D0A2C, 33);
+	off = mod_write_bytes(out, off, D_800D0A50, 31);
+	off = mod_write_bytes(out, off, D_800D0A70, 39);
+	off = mod_write_bytes(out, off, D_800D0A98, 25);
+	off = mod_write_bytes(out, off, sSeqInstructionArgsTable, 80);
+	return off;
+}

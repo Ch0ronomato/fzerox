@@ -1,0 +1,46 @@
+extern s32 gCollisionSparkCount;
+extern s32 gCollisionSparkIndex;
+extern struct MachineEffect gCollisionSparks[32];
+extern struct MachineEffect gExplosions1[32];
+extern s32 gExplosions1Count;
+extern s32 gExplosions1Index;
+extern struct MachineEffect gExplosions2[8];
+extern s32 gExplosions2Count;
+extern s32 gExplosions2Index;
+extern struct FallExplosionEffect gFallExplosions[32];
+extern s32 gFallExplosionsCount;
+extern s32 gFallExplosionsIndex;
+extern struct FlyingSparkEffect gFlyingSparks[32];
+extern s32 gFlyingSparksCount;
+extern s32 gFlyingSparksIndex;
+extern struct MachineDebrisEffect gMachineDebris[128];
+extern s32 gMachineDebrisCount;
+extern s32 gMachineDebrisIndex;
+extern struct MachineEffect gSmokes[32];
+extern s32 gSmokesCount;
+extern s32 gSmokesIndex;
+static u32 overlays__ovl_i2__effects__save(u8* out, u32 off)
+{
+	off = mod_write_bytes(out, off, &gCollisionSparkCount, 4);
+	off = mod_write_bytes(out, off, &gCollisionSparkIndex, 4);
+	off = mod_write_bytes(out, off, gCollisionSparks, 1536);
+	off = mod_write_bytes(out, off, gExplosions1, 1536);
+	off = mod_write_bytes(out, off, &gExplosions1Count, 4);
+	off = mod_write_bytes(out, off, &gExplosions1Index, 4);
+	off = mod_write_bytes(out, off, gExplosions2, 384);
+	off = mod_write_bytes(out, off, &gExplosions2Count, 4);
+	off = mod_write_bytes(out, off, &gExplosions2Index, 4);
+	off = mod_write_bytes(out, off, gFallExplosions, 768);
+	off = mod_write_bytes(out, off, &gFallExplosionsCount, 4);
+	off = mod_write_bytes(out, off, &gFallExplosionsIndex, 4);
+	off = mod_write_bytes(out, off, gFlyingSparks, 2560);
+	off = mod_write_bytes(out, off, &gFlyingSparksCount, 4);
+	off = mod_write_bytes(out, off, &gFlyingSparksIndex, 4);
+	off = mod_write_bytes(out, off, gMachineDebris, 14336);
+	off = mod_write_bytes(out, off, &gMachineDebrisCount, 4);
+	off = mod_write_bytes(out, off, &gMachineDebrisIndex, 4);
+	off = mod_write_bytes(out, off, gSmokes, 1536);
+	off = mod_write_bytes(out, off, &gSmokesCount, 4);
+	off = mod_write_bytes(out, off, &gSmokesIndex, 4);
+	return off;
+}

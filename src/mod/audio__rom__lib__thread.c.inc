@@ -1,0 +1,48 @@
+extern char devstr0[19];
+extern char devstr1[18];
+extern char devstr10[16];
+extern char devstr11[15];
+extern char devstr12[10];
+extern char devstr13[40];
+extern char devstr14[43];
+extern char devstr15[54];
+extern char devstr16[50];
+extern char devstr17[29];
+extern char devstr18[29];
+extern char devstr19[25];
+extern char devstr2[32];
+extern char devstr20[28];
+extern char devstr21[27];
+extern char devstr3[34];
+extern char devstr4[45];
+extern char devstr5[17];
+extern char devstr6[30];
+extern char devstr7[27];
+extern char devstr8[26];
+extern char devstr9[42];
+static u32 audio__rom__lib__thread__save(u8* out, u32 off)
+{
+	off = mod_write_bytes(out, off, devstr0, 19);
+	off = mod_write_bytes(out, off, devstr1, 18);
+	off = mod_write_bytes(out, off, devstr10, 16);
+	off = mod_write_bytes(out, off, devstr11, 15);
+	off = mod_write_bytes(out, off, devstr12, 10);
+	off = mod_write_bytes(out, off, devstr13, 40);
+	off = mod_write_bytes(out, off, devstr14, 43);
+	off = mod_write_bytes(out, off, devstr15, 54);
+	off = mod_write_bytes(out, off, devstr16, 50);
+	off = mod_write_bytes(out, off, devstr17, 29);
+	off = mod_write_bytes(out, off, devstr18, 29);
+	off = mod_write_bytes(out, off, devstr19, 25);
+	off = mod_write_bytes(out, off, devstr2, 32);
+	off = mod_write_bytes(out, off, devstr20, 28);
+	off = mod_write_bytes(out, off, devstr21, 27);
+	off = mod_write_bytes(out, off, devstr3, 34);
+	off = mod_write_bytes(out, off, devstr4, 45);
+	off = mod_write_bytes(out, off, devstr5, 17);
+	off = mod_write_bytes(out, off, devstr6, 30);
+	off = mod_write_bytes(out, off, devstr7, 27);
+	off = mod_write_bytes(out, off, devstr8, 26);
+	off = mod_write_bytes(out, off, devstr9, 42);
+	return off;
+}
