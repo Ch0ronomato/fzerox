@@ -1,3 +1,4 @@
+from find_struct_includes import *
 from dataclasses import dataclass, field
 import clang.cindex
 import functools
@@ -234,7 +235,7 @@ for file, ast in asts.items():
         if (
             node.kind == clang.cindex.CursorKind.VAR_DECL
             and node.location.file.name == file
-            and node.storage_class != clang.cindex.StorageClass.EXTERN
+            and node.storage_class == clang.cindex.StorageClass.NONE
         ):
             vars += 1
             size = fix_size(node)
@@ -277,3 +278,8 @@ with open("src/mod/save_runner.c.inc", "w") as f:
     f.write("\n\treturn off;")
     f.write("\n}")
     f.write("\n")
+
+# ---- Example usage after you build `usage` ----
+required_headers = collect_required_record_headers(usage)
+for h in required_headers:
+    print(f'#include "{h}"')

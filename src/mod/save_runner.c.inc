@@ -1,11 +1,6 @@
 #include "src/mod/audio__rom__external.c.inc"
-#include "src/mod/audio__rom__lib__effects.c.inc"
-#include "src/mod/audio__rom__lib__heap.c.inc"
 #include "src/mod/audio__rom__lib__load.c.inc"
-#include "src/mod/audio__rom__lib__playback.c.inc"
 #include "src/mod/audio__rom__lib__seqplayer.c.inc"
-#include "src/mod/audio__rom__lib__synthesis.c.inc"
-#include "src/mod/audio__rom__lib__thread.c.inc"
 #include "src/mod/game__194E0.c.inc"
 #include "src/mod/game__EA20.c.inc"
 #include "src/mod/game__bordered_box.c.inc"
@@ -30,13 +25,8 @@
 u32 global_write(u8* out, u32 off)
 {
 	off = audio__rom__external__save(out, off);
-	off = audio__rom__lib__effects__save(out, off);
-	off = audio__rom__lib__heap__save(out, off);
 	off = audio__rom__lib__load__save(out, off);
-	off = audio__rom__lib__playback__save(out, off);
 	off = audio__rom__lib__seqplayer__save(out, off);
-	off = audio__rom__lib__synthesis__save(out, off);
-	off = audio__rom__lib__thread__save(out, off);
 	off = game__194E0__save(out, off);
 	off = game__EA20__save(out, off);
 	off = game__bordered_box__save(out, off);
