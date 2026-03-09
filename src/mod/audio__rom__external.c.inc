@@ -96,3 +96,55 @@ static u32 audio__rom__external__save(u8* out, u32 off)
 	off = mod_write_bytes(out, off, &sVoiceSEStackTimer4, 2);
 	return off;
 }
+
+static u32 audio__rom__external__load(u8* out, u32 off)
+{
+	off = mod_read_bytes(out, off, &D_800D1A10, 4);
+	off = mod_read_bytes(out, off, &D_800D1A14, 4);
+	off = mod_read_bytes(out, off, &D_800D1A2C, 4);
+	off = mod_read_bytes(out, off, &D_800D1A54, 4);
+	off = mod_read_bytes(out, off, D_800D1A64, 16);
+	off = mod_read_bytes(out, off, D_800D1A78, 4);
+	off = mod_read_bytes(out, off, D_800D1A94, 4);
+	off = mod_read_bytes(out, off, gAudioPlayerFinishedState, 4);
+	off = mod_read_bytes(out, off, &gCurAudioTask, 8);
+	off = mod_read_bytes(out, off, &sActiveBgm, 1);
+	off = mod_read_bytes(out, off, sActivePlayerLevelSE, 32);
+	off = mod_read_bytes(out, off, &sActiveVoiceSE, 1);
+	off = mod_read_bytes(out, off, &sAudioClosestRacerDistance, 4);
+	off = mod_read_bytes(out, off, &sAudioClosestRacerId, 1);
+	off = mod_read_bytes(out, off, &sAudioDisableEnemyEngineSound, 1);
+	off = mod_read_bytes(out, off, &sAudioEnemyEngineStatus, 1);
+	off = mod_read_bytes(out, off, &sAudioLevelFadeoutActive, 1);
+	off = mod_read_bytes(out, off, sAudioLevelSEStack, 16);
+	off = mod_read_bytes(out, off, &sAudioPauseStatus, 1);
+	off = mod_read_bytes(out, off, &sAudioPlayerMode, 1);
+	off = mod_read_bytes(out, off, sAudioPlayerPreviousSpeed, 16);
+	off = mod_read_bytes(out, off, sAudioPlayerSEStack, 120);
+	off = mod_read_bytes(out, off, &sAudioPreviousClosestRacerDistance, 4);
+	off = mod_read_bytes(out, off, &sAudioPreviousClosestRacerId, 1);
+	off = mod_read_bytes(out, off, &sAudioRetireStatus, 1);
+	off = mod_read_bytes(out, off, &sBgmFadeoutTimer, 2);
+	off = mod_read_bytes(out, off, &sBgmPauseFadeoutTimer, 2);
+	off = mod_read_bytes(out, off, &sBgmPlayState, 1);
+	off = mod_read_bytes(out, off, sChannelVolume, 64);
+	off = mod_read_bytes(out, off, &sEnemyEngineFreqScale, 4);
+	off = mod_read_bytes(out, off, &sEnemyEngineLinearPan, 1);
+	off = mod_read_bytes(out, off, &sEnemyEngineVolume, 4);
+	off = mod_read_bytes(out, off, &sLevelFadeoutTimer, 2);
+	off = mod_read_bytes(out, off, sPlayerEngineEchoSoundState, 4);
+	off = mod_read_bytes(out, off, sPlayerEngineSoundState, 4);
+	off = mod_read_bytes(out, off, &sPlayerSEStatus, 1);
+	off = mod_read_bytes(out, off, &sPreviousSpecId, 1);
+	off = mod_read_bytes(out, off, sRacerActiveSE, 30);
+	off = mod_read_bytes(out, off, sRacerAudioVolume, 120);
+	off = mod_read_bytes(out, off, &sVoiceSEStack1, 1);
+	off = mod_read_bytes(out, off, &sVoiceSEStack2, 1);
+	off = mod_read_bytes(out, off, &sVoiceSEStack3, 1);
+	off = mod_read_bytes(out, off, &sVoiceSEStack4, 1);
+	off = mod_read_bytes(out, off, &sVoiceSEStackTimer1, 2);
+	off = mod_read_bytes(out, off, &sVoiceSEStackTimer2, 2);
+	off = mod_read_bytes(out, off, &sVoiceSEStackTimer3, 2);
+	off = mod_read_bytes(out, off, &sVoiceSEStackTimer4, 2);
+	return off;
+}

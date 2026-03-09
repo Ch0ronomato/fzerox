@@ -14,3 +14,14 @@ static u32 game__194E0__save(u8* out, u32 off)
 	off = mod_write_bytes(out, off, &gVenueType, 4);
 	return off;
 }
+
+static u32 game__194E0__load(u8* out, u32 off)
+{
+	off = mod_read_bytes(out, off, &D_800CD510, 4);
+	off = mod_read_bytes(out, off, gCupRaceStats, 144);
+	off = mod_read_bytes(out, off, &gForceCredits, 2);
+	off = mod_read_bytes(out, off, gRecordNameEntered, 4);
+	off = mod_read_bytes(out, off, &gSkyboxType, 4);
+	off = mod_read_bytes(out, off, &gVenueType, 4);
+	return off;
+}

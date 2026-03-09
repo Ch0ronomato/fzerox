@@ -50,3 +50,32 @@ u32 global_write(u8* out, u32 off)
 	off = overlays__ovl_i3__records_entry__save(out, off);
 	return off;
 }
+
+u32 global_load(u8* out, u32 off)
+{
+	off = audio__rom__external__load(out, off);
+	off = audio__rom__lib__load__load(out, off);
+	off = audio__rom__lib__seqplayer__load(out, off);
+	off = game__194E0__load(out, off);
+	off = game__EA20__load(out, off);
+	off = game__bordered_box__load(out, off);
+	off = game__camera__load(out, off);
+	off = game__common__load(out, off);
+	off = game__course__load(out, off);
+	off = game__course_gadgets__load(out, off);
+	off = game__game__load(out, off);
+	off = game__object__load(out, off);
+	off = game__racer__load(out, off);
+	off = overlays__ovl_i2__effects__load(out, off);
+	off = overlays__ovl_i2__font__load(out, off);
+	off = overlays__ovl_i2__race__load(out, off);
+	off = overlays__ovl_i2__save__load(out, off);
+	off = overlays__ovl_i2__transition__load(out, off);
+	off = overlays__ovl_i3__background__load(out, off);
+	off = overlays__ovl_i3__cpu__load(out, off);
+	off = overlays__ovl_i3__hud__load(out, off);
+	off = overlays__ovl_i3__menus__load(out, off);
+	off = overlays__ovl_i3__minimap__load(out, off);
+	off = overlays__ovl_i3__records_entry__load(out, off);
+	return off;
+}

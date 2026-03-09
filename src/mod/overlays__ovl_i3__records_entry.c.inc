@@ -56,3 +56,35 @@ static u32 overlays__ovl_i3__records_entry__save(u8* out, u32 off)
 	off = mod_write_bytes(out, off, &sSpinningKeyboardCharacterPerspectiveScale, 2);
 	return off;
 }
+
+static u32 overlays__ovl_i3__records_entry__load(u8* out, u32 off)
+{
+	off = mod_read_bytes(out, off, &gRecordNameEnteredLength, 2);
+	off = mod_read_bytes(out, off, &sEnterKeyboardIndex, 2);
+	off = mod_read_bytes(out, off, &sKeyboardCursorX, 2);
+	off = mod_read_bytes(out, off, &sKeyboardCursorY, 2);
+	off = mod_read_bytes(out, off, sKeyboardObjects, 500);
+	off = mod_read_bytes(out, off, sNameEntryStr, 11);
+	off = mod_read_bytes(out, off, sNameKeyboardCharacters, 51);
+	off = mod_read_bytes(out, off, &sPreviousRecordsEntryNameEntryState, 2);
+	off = mod_read_bytes(out, off, &sRecordsEntryBestLapWordsLeftOffset, 2);
+	off = mod_read_bytes(out, off, &sRecordsEntryBestLapWordsTopOffset, 2);
+	off = mod_read_bytes(out, off, &sRecordsEntryBestTimeLeft, 2);
+	off = mod_read_bytes(out, off, &sRecordsEntryBestTimeTop, 2);
+	off = mod_read_bytes(out, off, &sRecordsEntryFlags, 2);
+	off = mod_read_bytes(out, off, &sRecordsEntryIncreaseState, 2);
+	off = mod_read_bytes(out, off, &sRecordsEntryMaxSpeedLeft, 4);
+	off = mod_read_bytes(out, off, &sRecordsEntryMaxSpeedTop, 4);
+	off = mod_read_bytes(out, off, &sRecordsEntryMaxSpeedTopMachineOffset, 4);
+	off = mod_read_bytes(out, off, &sRecordsEntryNameEntryState, 2);
+	off = mod_read_bytes(out, off, &sRecordsEntryNameEntryTransitionTimer, 2);
+	off = mod_read_bytes(out, off, &sRecordsEntryRecordHeight, 4);
+	off = mod_read_bytes(out, off, &sRecordsEntryRecordLeft, 4);
+	off = mod_read_bytes(out, off, &sRecordsEntryRecordLeftOffset, 4);
+	off = mod_read_bytes(out, off, &sRecordsEntryRecordTop, 4);
+	off = mod_read_bytes(out, off, &sRecordsEntryRecordsTransitionTimer, 4);
+	off = mod_read_bytes(out, off, &sRecordsEntryState, 4);
+	off = mod_read_bytes(out, off, sSelectedCharacterTransitionTimer, 6);
+	off = mod_read_bytes(out, off, &sSpinningKeyboardCharacterPerspectiveScale, 2);
+	return off;
+}

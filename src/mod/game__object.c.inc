@@ -12,3 +12,13 @@ static u32 game__object__save(u8* out, u32 off)
 	off = mod_write_bytes(out, off, gObjects, 2560);
 	return off;
 }
+
+static u32 game__object__load(u8* out, u32 off)
+{
+	off = mod_read_bytes(out, off, D_800E33E0, 3200);
+	off = mod_read_bytes(out, off, &D_800E3A20, 4);
+	off = mod_read_bytes(out, off, D_800E3F28, 512);
+	off = mod_read_bytes(out, off, D_800E4068, 256);
+	off = mod_read_bytes(out, off, gObjects, 2560);
+	return off;
+}

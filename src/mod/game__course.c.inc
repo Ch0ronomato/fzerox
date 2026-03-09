@@ -114,3 +114,64 @@ static u32 game__course__save(u8* out, u32 off)
 	off = mod_write_bytes(out, off, &sWorkingSegmentChunk, 8);
 	return off;
 }
+
+static u32 game__course__load(u8* out, u32 off)
+{
+	off = mod_read_bytes(out, off, &D_800CF500, 4);
+	off = mod_read_bytes(out, off, &D_800CF50C, 4);
+	off = mod_read_bytes(out, off, &D_800CF510, 4);
+	off = mod_read_bytes(out, off, &D_800CF514, 4);
+	off = mod_read_bytes(out, off, &D_800CF518, 4);
+	off = mod_read_bytes(out, off, &D_800CF51C, 4);
+	off = mod_read_bytes(out, off, D_800CF528, 392);
+	off = mod_read_bytes(out, off, D_800CF988, 16);
+	off = mod_read_bytes(out, off, D_800CF998, 16);
+	off = mod_read_bytes(out, off, D_800CF9A8, 24);
+	off = mod_read_bytes(out, off, D_800CF9B4, 24);
+	off = mod_read_bytes(out, off, D_800CF9C0, 24);
+	off = mod_read_bytes(out, off, D_800CF9CC, 24);
+	off = mod_read_bytes(out, off, D_800CF9D8, 24);
+	off = mod_read_bytes(out, off, D_800CF9E4, 24);
+	off = mod_read_bytes(out, off, D_800CF9F0, 32);
+	off = mod_read_bytes(out, off, D_800CFA00, 32);
+	off = mod_read_bytes(out, off, D_800CFA10, 32);
+	off = mod_read_bytes(out, off, D_800CFA20, 32);
+	off = mod_read_bytes(out, off, &D_800F8524, 4);
+	off = mod_read_bytes(out, off, &D_800F892C, 4);
+	off = mod_read_bytes(out, off, D_800F8930, 10);
+	off = mod_read_bytes(out, off, &D_800F894C, 4);
+	off = mod_read_bytes(out, off, &D_800F8950, 4);
+	off = mod_read_bytes(out, off, D_800F8958, 192);
+	off = mod_read_bytes(out, off, &D_800F89B8, 8);
+	off = mod_read_bytes(out, off, &D_800F89BC, 8);
+	off = mod_read_bytes(out, off, &D_800F89C0, 4);
+	off = mod_read_bytes(out, off, &D_800F89C8, 8);
+	off = mod_read_bytes(out, off, &D_800F89D4, 4);
+	off = mod_read_bytes(out, off, &D_800F89D8, 4);
+	off = mod_read_bytes(out, off, &D_800F89E0, 4);
+	off = mod_read_bytes(out, off, &D_800F89E4, 4);
+	off = mod_read_bytes(out, off, &D_800F89E8, 4);
+	off = mod_read_bytes(out, off, &gCourseIndex, 4);
+	off = mod_read_bytes(out, off, &gCourseVtxPtr, 8);
+	off = mod_read_bytes(out, off, &gCurrentCourseInfo, 8);
+	off = mod_read_bytes(out, off, &gLastRandomCourseIndex, 2);
+	off = mod_read_bytes(out, off, &gSegmentChunkCount, 4);
+	off = mod_read_bytes(out, off, gTrackJoinUpperLength, 32);
+	off = mod_read_bytes(out, off, &sCourseDisp, 8);
+	off = mod_read_bytes(out, off, &sCourseFarRenderDistance, 4);
+	off = mod_read_bytes(out, off, &sCourseFogStartDistance, 4);
+	off = mod_read_bytes(out, off, &sCourseRenderOriginDistance, 4);
+	off = mod_read_bytes(out, off, &sLastSegmentChunk, 8);
+	off = mod_read_bytes(out, off, &sLastTrackShapeType, 4);
+	off = mod_read_bytes(out, off, &sRandomCourseInitMask1, 4);
+	off = mod_read_bytes(out, off, &sRandomCourseInitMask2, 4);
+	off = mod_read_bytes(out, off, &sRandomCourseInitSeed1, 4);
+	off = mod_read_bytes(out, off, &sRandomCourseInitSeed2, 4);
+	off = mod_read_bytes(out, off, sSegmentChunkCalculateReferencePosFuncs, 64);
+	off = mod_read_bytes(out, off, sSegmentChunkGroups, 2048);
+	off = mod_read_bytes(out, off, sSegmentChunkJoinFuncs, 64);
+	off = mod_read_bytes(out, off, &sWorkingChunkJoinInfo, 4);
+	off = mod_read_bytes(out, off, &sWorkingNextSegmentChunk, 8);
+	off = mod_read_bytes(out, off, &sWorkingSegmentChunk, 8);
+	return off;
+}

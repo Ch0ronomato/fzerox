@@ -16,3 +16,15 @@ static u32 overlays__ovl_i2__font__save(u8* out, u32 off)
 	off = mod_write_bytes(out, off, kMachineWeightDigitWidths, 20);
 	return off;
 }
+
+static u32 overlays__ovl_i2__font__load(u8* out, u32 off)
+{
+	off = mod_read_bytes(out, off, kFont1CharWidths, 96);
+	off = mod_read_bytes(out, off, kFont2CharWidths, 96);
+	off = mod_read_bytes(out, off, kFont3CharWidths, 468);
+	off = mod_read_bytes(out, off, kFont4CharWidths, 470);
+	off = mod_read_bytes(out, off, kFont5CharWidths, 470);
+	off = mod_read_bytes(out, off, kFont6CharWidths, 474);
+	off = mod_read_bytes(out, off, kMachineWeightDigitWidths, 20);
+	return off;
+}

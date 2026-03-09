@@ -66,3 +66,40 @@ static u32 overlays__ovl_i3__hud__save(u8* out, u32 off)
 	off = mod_write_bytes(out, off, sSpeedPositions, 256);
 	return off;
 }
+
+static u32 overlays__ovl_i3__hud__load(u8* out, u32 off)
+{
+	off = mod_read_bytes(out, off, &D_8013F100, 8);
+	off = mod_read_bytes(out, off, &D_i3_8013EFFC, 4);
+	off = mod_read_bytes(out, off, &D_i3_8013F000, 4);
+	off = mod_read_bytes(out, off, &D_i3_8013F004, 4);
+	off = mod_read_bytes(out, off, &D_i3_8013F018, 4);
+	off = mod_read_bytes(out, off, &D_i3_8013F01C, 4);
+	off = mod_read_bytes(out, off, D_i3_8013F020, 144);
+	off = mod_read_bytes(out, off, D_i3_8013F078, 16);
+	off = mod_read_bytes(out, off, D_i3_80141EA8, 352);
+	off = mod_read_bytes(out, off, gPlayerLapNumbers, 32);
+	off = mod_read_bytes(out, off, sEnergyBarFillColors, 80);
+	off = mod_read_bytes(out, off, sEnergyBarPositions, 256);
+	off = mod_read_bytes(out, off, sEnergyOutlinePositions, 256);
+	off = mod_read_bytes(out, off, &sFinalLapStarted, 4);
+	off = mod_read_bytes(out, off, sIntervalPositions, 256);
+	off = mod_read_bytes(out, off, sLapPositions, 256);
+	off = mod_read_bytes(out, off, sLeadRivalRaceTime, 32);
+	off = mod_read_bytes(out, off, sLivesPositions, 256);
+	off = mod_read_bytes(out, off, sPlayerLeadInterval, 32);
+	off = mod_read_bytes(out, off, sPlayerTimePositions, 256);
+	off = mod_read_bytes(out, off, sPlayerTimerPositions, 256);
+	off = mod_read_bytes(out, off, sPortraitPositionYPos, 48);
+	off = mod_read_bytes(out, off, sPortraitReplacementIndexes, 240);
+	off = mod_read_bytes(out, off, sPortraitTextureScale, 120);
+	off = mod_read_bytes(out, off, sPortraitYPosOffsets, 48);
+	off = mod_read_bytes(out, off, sPositionPositions, 256);
+	off = mod_read_bytes(out, off, sPositionScales, 16);
+	off = mod_read_bytes(out, off, &sPracticeBestLapCounter, 4);
+	off = mod_read_bytes(out, off, sPreviousLapTimes, 32);
+	off = mod_read_bytes(out, off, sReversePositions, 256);
+	off = mod_read_bytes(out, off, &sSecondLapStarted, 4);
+	off = mod_read_bytes(out, off, sSpeedPositions, 256);
+	return off;
+}

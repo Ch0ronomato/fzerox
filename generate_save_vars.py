@@ -144,6 +144,26 @@ class GameState:
         return f"off = mod_write_bytes(out, off, &{name}, {size});"
 # dear reader this was chat gpt
 
+    @property
+    def load(self):
+        # Skip const globals (rodata)
+        if self.is_const:
+            return ""
+
+        # Skip function pointer tables
+        if self.is_function_pointer:
+            return ""
+
+        name = self.Name
+        size = self.Size
+
+        # Array: decay to pointer automatically
+        if self.is_array:
+            return f"off = mod_read_bytes(out, off, {name}, {size});"
+
+        # Scalar or pointer variable: take address
+        return f"off = mod_read_bytes(out, off, &{name}, {size});"
+
     def record_pointer(self):
         if "LEAVE_AS_IS" in pointers['pointers'].get(self.Name, ""):
             return False
@@ -251,10 +271,11 @@ v = 0
 for k, vars in itertools.groupby(sorted(usage), key=operator.attrgetter("File")):
     externs = []
     memcpys = []
+    loads = []
     for var in filter(lambda x: x.record_pointer(), vars):
         externs.append(var.extern)
-        # u8* out, u32& off, void* src, u32 size
         memcpys.append(var.save)
+        loads.append(var.load)
     with open(f"src/mod/{k}.c.inc", "w") as fw:
         fw.write("\n".join(externs))
         fw.write(f"\nstatic u32 {k}__save(u8* out, u32 off)")
@@ -264,17 +285,33 @@ for k, vars in itertools.groupby(sorted(usage), key=operator.attrgetter("File"))
         fw.write("\n}")
         fw.write("\n")
 
+        fw.write(f"\nstatic u32 {k}__load(u8* out, u32 off)")
+        fw.write("\n{")
+        fw.write("\n\t".join([""] + loads))
+        fw.write("\n\treturn off;")
+        fw.write("\n}")
+        fw.write("\n")
+
 
 with open("src/mod/save_runner.c.inc", "w") as f:
     includes = []
     calls = []
+    read_calls = []
     for k, vars in itertools.groupby(sorted(usage), key=operator.attrgetter("File")):
         includes.append(f"#include \"src/mod/{k}.c.inc\"")
         calls.append(f"off = {k}__save(out, off);")
+        read_calls.append(f"off = {k}__load(out, off);")
     f.write("\n".join(includes))
     f.write("\nu32 global_write(u8* out, u32 off)")
     f.write("\n{")
     f.write("\n\t".join([""] + calls))
+    f.write("\n\treturn off;")
+    f.write("\n}")
+    f.write("\n")
+
+    f.write("\nu32 global_load(u8* out, u32 off)")
+    f.write("\n{")
+    f.write("\n\t".join([""] + read_calls))
     f.write("\n\treturn off;")
     f.write("\n}")
     f.write("\n")

@@ -120,3 +120,67 @@ static u32 overlays__ovl_i3__cpu__save(u8* out, u32 off)
 	off = mod_write_bytes(out, off, &sZodaRacerId, 4);
 	return off;
 }
+
+static u32 overlays__ovl_i3__cpu__load(u8* out, u32 off)
+{
+	off = mod_read_bytes(out, off, &D_80141900, 4);
+	off = mod_read_bytes(out, off, D_i3_8013DBE0, 16);
+	off = mod_read_bytes(out, off, &D_i3_8013DBE8, 8);
+	off = mod_read_bytes(out, off, &D_i3_8013DBEC, 4);
+	off = mod_read_bytes(out, off, D_i3_8013DBF0, 20);
+	off = mod_read_bytes(out, off, D_i3_8013DC04, 20);
+	off = mod_read_bytes(out, off, D_i3_8013DC18, 904);
+	off = mod_read_bytes(out, off, D_i3_8013DFA0, 904);
+	off = mod_read_bytes(out, off, D_i3_8013E328, 768);
+	off = mod_read_bytes(out, off, D_i3_8013E4A8, 768);
+	off = mod_read_bytes(out, off, D_i3_8013E628, 768);
+	off = mod_read_bytes(out, off, D_i3_8013E7A8, 420);
+	off = mod_read_bytes(out, off, D_i3_8013E94C, 112);
+	off = mod_read_bytes(out, off, D_i3_8013E9BC, 72);
+	off = mod_read_bytes(out, off, D_i3_8013E9E0, 16);
+	off = mod_read_bytes(out, off, D_i3_8013E9F0, 960);
+	off = mod_read_bytes(out, off, D_i3_8013EBD0, 96);
+	off = mod_read_bytes(out, off, D_i3_8013EC30, 96);
+	off = mod_read_bytes(out, off, D_i3_8013ED08, 8);
+	off = mod_read_bytes(out, off, D_i3_8013ED10, 12);
+	off = mod_read_bytes(out, off, D_i3_8013ED1C, 12);
+	off = mod_read_bytes(out, off, &D_i3_80141904, 4);
+	off = mod_read_bytes(out, off, &D_i3_8014190C, 4);
+	off = mod_read_bytes(out, off, &D_i3_80141914, 4);
+	off = mod_read_bytes(out, off, &D_i3_80141990, 4);
+	off = mod_read_bytes(out, off, &D_i3_80141994, 4);
+	off = mod_read_bytes(out, off, &D_i3_80141998, 4);
+	off = mod_read_bytes(out, off, &gSlowRacersForPodium, 4);
+	off = mod_read_bytes(out, off, &sAntonioGusterRacerId, 4);
+	off = mod_read_bytes(out, off, &sBabaRacerId, 4);
+	off = mod_read_bytes(out, off, &sBeastmanRacerId, 4);
+	off = mod_read_bytes(out, off, &sBillyRacerId, 4);
+	off = mod_read_bytes(out, off, &sBioRexRacerId, 4);
+	off = mod_read_bytes(out, off, &sBlackShadowRacerId, 4);
+	off = mod_read_bytes(out, off, &sBloodFalconRacerId, 4);
+	off = mod_read_bytes(out, off, &sCaptainFalconRacerId, 4);
+	off = mod_read_bytes(out, off, &sDrClashRacerId, 4);
+	off = mod_read_bytes(out, off, &sDrStewartRacerId, 4);
+	off = mod_read_bytes(out, off, &sDraqRacerId, 4);
+	off = mod_read_bytes(out, off, &sGomarAndShiohRacerId, 4);
+	off = mod_read_bytes(out, off, &sJackLevinRacerId, 4);
+	off = mod_read_bytes(out, off, &sJamesMcCloudRacerId, 4);
+	off = mod_read_bytes(out, off, &sJodySummerRacerId, 4);
+	off = mod_read_bytes(out, off, &sJohnTanakaRacerId, 4);
+	off = mod_read_bytes(out, off, &sKateAlenRacerId, 4);
+	off = mod_read_bytes(out, off, &sLeonRacerId, 4);
+	off = mod_read_bytes(out, off, &sMichaelChainRacerId, 4);
+	off = mod_read_bytes(out, off, &sMightyGazelleRacerId, 4);
+	off = mod_read_bytes(out, off, &sMrEadRacerId, 4);
+	off = mod_read_bytes(out, off, &sMrsArrowRacerId, 4);
+	off = mod_read_bytes(out, off, &sOctomanRacerId, 4);
+	off = mod_read_bytes(out, off, &sPicoRacerId, 4);
+	off = mod_read_bytes(out, off, &sPlayerRacer, 8);
+	off = mod_read_bytes(out, off, &sRogerBusterRacerId, 4);
+	off = mod_read_bytes(out, off, &sSamuraiGorohRacerId, 4);
+	off = mod_read_bytes(out, off, &sSilverNeelsenRacerId, 4);
+	off = mod_read_bytes(out, off, &sSuperArrowRacerId, 4);
+	off = mod_read_bytes(out, off, &sTheSkullRacerId, 4);
+	off = mod_read_bytes(out, off, &sZodaRacerId, 4);
+	return off;
+}
