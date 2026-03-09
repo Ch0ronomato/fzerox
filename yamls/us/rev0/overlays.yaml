@@ -311,3 +311,4 @@
     symbol_name_format: ovl_save_state_$VRAM
     subsegments:
       - [auto, c, game/mod]
+      - [auto, c, libcart]
