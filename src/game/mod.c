@@ -63,6 +63,11 @@ static u32 mod_write_bytes(u8* out, u32 off, void* src, u32 size) {
     return off + size;
 }
 
+static u32 mod_read_bytes(u8* in, u32 off, void* dst, u32 size) {
+    memcpy(dst, in + off, size);
+    return off + size;
+}
+
 // generated methods
 #include "src/mod/save_runner.c.inc"
 
@@ -85,43 +90,67 @@ extern uintptr_t gArenaEndPtrs[3];
 
 void WriteRegionToSD(const void* src_, u32 size, u32* io_lba)
 {
-    u32 padded;
     const u8* src = (const u8*)src_;
     u32 remaining = size;
+    u32 buffered = 0;
 
-    while (remaining > 0)
+   while (remaining > 0)
     {
-        /* Use gSaveStateMemory as temporary buffer */
-        u32 chunk_size = remaining;
+        u32 space = KNOWN_SIZE - buffered;
+        u32 n = (remaining < space) ? remaining : space;
 
-        if (chunk_size > KNOWN_SIZE)
-            chunk_size = KNOWN_SIZE;
-
-        /* Copy arena memory into staging buffer */
-        memcpy(gSaveStateMemory, src, chunk_size);
-
-        /* Pad to sector boundary */
-        padded = (chunk_size + SECTOR_SIZE - 1) & ~(SECTOR_SIZE - 1);
-
-        if (padded > chunk_size)
+        /* copy into staging buffer */
         {
             u32 i;
-            for (i = chunk_size; i < padded; i++)
+            for (i = 0; i < n; i++)
             {
-                gSaveStateMemory[i] = 0;
+                gSaveStateMemory[buffered + i] = src[i];
             }
         }
 
-        /* Flush cache so DMA sees correct data */
-        osWritebackDCache(gSaveStateMemory, padded);
+        buffered += n;
+        src += n;
+        remaining -= n;
 
-        /* Write to SD */
-        cart_card_wr_dram(gSaveStateMemory, *io_lba, padded / SECTOR_SIZE);
+        /* write out all full sectors */
+        if (buffered >= SECTOR_SIZE)
+        {
+            u32 full_bytes = buffered & ~(SECTOR_SIZE - 1); /* round down */
+            u32 sectors = full_bytes / SECTOR_SIZE;
 
-        /* Advance */
-        *io_lba += padded / SECTOR_SIZE;
-        src += chunk_size;
-        remaining -= chunk_size;
+            osWritebackDCache(gSaveStateMemory, full_bytes);
+            sc_card_wr_dram(gSaveStateMemory, *io_lba, sectors);
+
+            *io_lba += sectors;
+
+            /* move remainder down to front */
+            {
+                u32 remainder = buffered - full_bytes;
+                u32 i;
+                for (i = 0; i < remainder; i++)
+                {
+                    gSaveStateMemory[i] = gSaveStateMemory[full_bytes + i];
+                }
+                buffered = remainder;
+            }
+        }
+    }
+
+    /* After loop ends, buffered may contain <512 bytes.
+       We must pad and write exactly one final sector if anything remains. */
+
+    if (buffered > 0)
+    {
+        u32 i;
+        for (i = buffered; i < SECTOR_SIZE; i++)
+        {
+            gSaveStateMemory[i] = 0;
+        }
+
+        osWritebackDCache(gSaveStateMemory, SECTOR_SIZE);
+        sc_card_wr_dram(gSaveStateMemory, *io_lba, 1);
+
+        *io_lba += 1;
     }
 }
 
@@ -171,7 +200,20 @@ void Mod_Save(void)
 
 void Mod_Load(void)
 {
-  return;
+  u32 addr;
+  u32 size;
+  u32 offset;
+  u32 sectors;
+  u32 lastSectorWrite;
+  sectors = KNOWN_SIZE / SECTOR_SIZE;
+  offset = LBA_OFFSET;
+  sc_card_rd_dram(gSaveStateMemory, offset, sectors);
+  osInvalDCache(gSaveStateMemory, sectors);
+
+  // double check for dead beef
+  global_load(gSaveStateMemory, 8);
+
+  // Load all the arenas
 }
 
 extern Controller gControllers[];
