@@ -50,6 +50,7 @@ typedef struct unk_800F8958 {
     s32 loadVtxIndex;
 } unk_800F8958; // size = 0x30
 
+char k = '1';
 typedef struct SegmentChunkGroup {
     SegmentChunk* startChunk;
     SegmentChunk* endChunk;
@@ -88,7 +89,7 @@ extern int cart_type;
 extern uintptr_t gArenaStartPtrs[3];
 extern uintptr_t gArenaEndPtrs[3];
 
-void WriteRegionToSD(const void* src_, u32 size, u32* io_lba)
+static void WriteRegionToSD(const void* src_, u32 size, u32* io_lba)
 {
     const u8* src = (const u8*)src_;
     u32 remaining = size;
@@ -154,6 +155,44 @@ void WriteRegionToSD(const void* src_, u32 size, u32* io_lba)
     }
 }
 
+static void ReadRegionFromSD(void* dst_, u32 size, u32* io_lba)
+{
+    u8* dst = (u8*)dst_;
+    u32 remaining = size;
+    u32 buffered = 0;      /* bytes currently in staging buffer */
+    u32 offset = 0;        /* read offset within staging buffer */
+
+    while (remaining > 0)
+    {
+        /* If staging buffer is empty, fetch next sector */
+        if (offset >= buffered)
+        {
+            sc_card_rd_dram(gSaveStateMemory, *io_lba, 1);
+            osInvalDCache(gSaveStateMemory, SECTOR_SIZE);
+
+            (*io_lba)++;
+            buffered = SECTOR_SIZE;
+            offset = 0;
+        }
+
+        /* Determine how many bytes we can copy this iteration */
+        {
+            u32 available = buffered - offset;
+            u32 n = (remaining < available) ? remaining : available;
+            u32 i;
+
+            for (i = 0; i < n; i++)
+            {
+                dst[i] = gSaveStateMemory[offset + i];
+            }
+
+            dst += n;
+            offset += n;
+            remaining -= n;
+        }
+    }
+}
+
 void Mod_Entry(void)
 {
     if (cart_init() != 0) return;
@@ -175,7 +214,7 @@ void Mod_Save(void)
     gSaveStateMemory[2] = 'A';
     gSaveStateMemory[5] = 'E';
     gSaveStateMemory[6] = 'E';
-    gSaveStateMemory[7] = 'F';
+    gSaveStateMemory[7] = k++;
     
     offset = global_write(gSaveStateMemory, 8);
     *(u32*)&gSaveStateMemory[offset] = cart_size;
@@ -202,18 +241,32 @@ void Mod_Load(void)
 {
   u32 addr;
   u32 size;
-  u32 offset;
+  u32 off;
   u32 sectors;
   u32 lastSectorWrite;
   sectors = KNOWN_SIZE / SECTOR_SIZE;
-  offset = LBA_OFFSET;
-  sc_card_rd_dram(gSaveStateMemory, offset, sectors);
-  osInvalDCache(gSaveStateMemory, sectors);
+  addr = (cart_size / SECTOR_SIZE) - LBA_OFFSET;
+  sc_card_rd_dram(gSaveStateMemory, addr, sectors);
+  osInvalDCache(gSaveStateMemory, sectors * SECTOR_SIZE);
 
   // double check for dead beef
-  global_load(gSaveStateMemory, 8);
+  off = 8;
+  off = global_load(gSaveStateMemory, off);
 
   // Load all the arenas
+  sectors = (off + SECTOR_SIZE - 1) / SECTOR_SIZE;
+  addr += sectors;
+  size = (u32)(gArenaEndPtrs[0] - gArenaStartPtrs[0]);
+  if (size > 0)
+      ReadRegionFromSD((void*)gArenaStartPtrs[0], size, &addr);
+
+  size = (u32)(gArenaEndPtrs[1] - gArenaStartPtrs[1]);
+  if (size > 0)
+      ReadRegionFromSD((void*)gArenaStartPtrs[1], size, &addr);
+
+  size = (u32)(gArenaEndPtrs[2] - gArenaStartPtrs[2]);
+  if (size > 0)
+      ReadRegionFromSD((void*)gArenaStartPtrs[2], size, &addr);
 }
 
 extern Controller gControllers[];
@@ -224,12 +277,12 @@ void Mod_Main(void)
 
   /* Current buttons */
   buttons = gControllers[0].buttonPrev;
-  if ((buttons & BTN_CDOWN) && (buttons & BTN_CRIGHT))
+  if ((buttons & BTN_CDOWN) && (buttons & BTN_L) && (buttons & BTN_R))
   {
     Mod_Save();
   }
 
-  if ((buttons & BTN_CUP) && (buttons & BTN_CLEFT))
+  if ((buttons & BTN_CUP) && (buttons & BTN_A) && (buttons & BTN_R))
   {
     Mod_Load();
   }
