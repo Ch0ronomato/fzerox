@@ -169,6 +169,89 @@ class GameState:
             return False
         return True
 
+    @property
+    def pointer_policy(self):
+        return pointers['pointers'].get(self.Name)
+
+    @property
+    def is_pointer_global(self):
+        return self.is_pointer and self.pointer_policy is not None
+
+
+def generate_pointer_relocs(game_states):
+    save_lines = []
+    load_lines = []
+
+    for gs in sorted(game_states, key=lambda x: x.Name):
+        policy = pointers['pointers'].get(gs.Name)
+
+        if not policy or policy == "PTR_LEAVE_AS_IS":
+            continue
+        if not gs.is_pointer:
+            continue
+
+        name = gs.Name
+
+        # ---- SAVE SIDE ----
+        save_lines.append(f"    /* {name} */")
+        save_lines.append("    {")
+        save_lines.append("        s16 arena_index = -1;")
+        save_lines.append("        u32 offset_val = 0;")
+        save_lines.append("")
+        save_lines.append(f"        if ({name} != NULL)")
+        save_lines.append("        {")
+        for i in range(3):
+            cond = (
+                f"((uintptr_t){name} >= gArenaStartPtrs[{i}] && "
+                f"(uintptr_t){name} < gArenaEndPtrs[{i}])"
+            )
+            if i == 0:
+                save_lines.append(f"            if {cond}")
+            else:
+                save_lines.append(f"            else if {cond}")
+            save_lines.append("            {")
+            save_lines.append(f"                arena_index = {i};")
+            save_lines.append(
+                f"                offset_val = (u32)((uintptr_t){
+                    name} - gArenaStartPtrs[{i}]);"
+            )
+            save_lines.append("            }")
+        save_lines.append("        }")
+        save_lines.append("")
+        save_lines.append(
+            "        off = mod_write_bytes(out, off, &arena_index, sizeof(arena_index));")
+        save_lines.append(
+            "        off = mod_write_bytes(out, off, &offset_val, sizeof(offset_val));")
+        save_lines.append("    }")
+        save_lines.append("")
+
+        # ---- LOAD SIDE ----
+        load_lines.append(f"    /* {name} */")
+        load_lines.append("    {")
+        load_lines.append("        s16 arena_index;")
+        load_lines.append("        u32 offset_val;")
+        load_lines.append("")
+        load_lines.append(
+            "        off = mod_read_bytes(in, off, &arena_index, sizeof(arena_index));")
+        load_lines.append(
+            "        off = mod_read_bytes(in, off, &offset_val, sizeof(offset_val));")
+        load_lines.append("")
+        load_lines.append("        if (arena_index >= 0)")
+        load_lines.append("        {")
+        load_lines.append(
+            f"            {
+                name} = (void*)(gArenaStartPtrs[arena_index] + offset_val);"
+        )
+        load_lines.append("        }")
+        load_lines.append("        else")
+        load_lines.append("        {")
+        load_lines.append(f"            {name} = NULL;")
+        load_lines.append("        }")
+        load_lines.append("    }")
+        load_lines.append("")
+
+    return save_lines, load_lines
+
 
 def new_game_state(file, *args):
     name = str(file)\
@@ -315,6 +398,16 @@ with open("src/mod/save_runner.c.inc", "w") as f:
     f.write("\n\treturn off;")
     f.write("\n}")
     f.write("\n")
+
+with open("src/mod/pointer_relocs.c.inc", "w") as fw:
+    save_lines, load_lines = generate_pointer_relocs(usage)
+    fw.write("static void save_pointer_relocs(void)\n{\n")
+    fw.write("\n".join(save_lines))
+    fw.write("\n}\n\n")
+
+    fw.write("static void load_pointer_relocs(void)\n{\n")
+    fw.write("\n".join(load_lines))
+    fw.write("\n}\n")
 
 # ---- Example usage after you build `usage` ----
 required_headers = collect_required_record_headers(usage)
