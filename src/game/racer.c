@@ -4914,6 +4914,7 @@ void func_80095144(void) {
 void Racer_UpdateMovement(Racer* racer) {
     Controller dummyController;
     f32 preInputEnergy;
+    s16 buttonsCurrent;
 
     if (racer->stateFlags & RACER_STATE_CPU_CONTROLLED) {
         preInputEnergy = racer->energy;
@@ -4934,11 +4935,12 @@ void Racer_UpdateMovement(Racer* racer) {
                          racer->segmentPositionInfo.segmentDisplacement.y * racer->segmentBasis.z.y -
                          racer->segmentPositionInfo.segmentDisplacement.z * racer->segmentBasis.z.z;
     }
+
 }
 
-extern s8 gGamePaused;
 extern GfxPool* gGfxPool;
 extern s32 gFastestGhostTime;
+extern s8 gGamePaused;
 
 void Racer_Update(void) {
     f32 xVelocityDiff;

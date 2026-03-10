@@ -58,7 +58,6 @@ typedef struct SegmentChunkGroup {
     s32 drawState;
 } SegmentChunkGroup; // size = 0x10
 
-
 static u32 mod_write_bytes(u8* out, u32 off, void* src, u32 size) {
     memcpy(out + off, src, size);
     return off + size;
@@ -88,6 +87,7 @@ extern int cart_type;
 
 extern uintptr_t gArenaStartPtrs[3];
 extern uintptr_t gArenaEndPtrs[3];
+#include "src/mod/pointer_relocs.c.inc"
 
 static void WriteRegionToSD(const void* src_, u32 size, u32* io_lba)
 {
@@ -217,6 +217,7 @@ void Mod_Save(void)
     gSaveStateMemory[7] = k++;
     
     offset = global_write(gSaveStateMemory, 8);
+    offset = save_pointer_relocs(gSaveStateMemory, offset);
     *(u32*)&gSaveStateMemory[offset] = cart_size;
     offset += 4;
     sectors = (offset + SECTOR_SIZE - 1) / SECTOR_SIZE;
@@ -244,14 +245,14 @@ void Mod_Load(void)
   u32 off;
   u32 sectors;
   u32 lastSectorWrite;
-  sectors = KNOWN_SIZE / SECTOR_SIZE;
   addr = (cart_size / SECTOR_SIZE) - LBA_OFFSET;
-  sc_card_rd_dram(gSaveStateMemory, addr, sectors);
-  osInvalDCache(gSaveStateMemory, sectors * SECTOR_SIZE);
+  sc_card_rd_dram(gSaveStateMemory, addr, 400);
+  osInvalDCache(gSaveStateMemory, 400 * SECTOR_SIZE);
 
   // double check for dead beef
   off = 8;
   off = global_load(gSaveStateMemory, off);
+  off = load_pointer_relocs(gSaveStateMemory, off);
 
   // Load all the arenas
   sectors = (off + SECTOR_SIZE - 1) / SECTOR_SIZE;
@@ -269,38 +270,24 @@ void Mod_Load(void)
       ReadRegionFromSD((void*)gArenaStartPtrs[2], size, &addr);
 }
 
-extern Controller gControllers[];
-void Mod_Main(void)
+extern Controller gSharedController;
+bool Mod_Main(void)
 {
   u16 buttons;
-  u16 pressed;
+  u16 down;
 
   /* Current buttons */
-  buttons = gControllers[0].buttonPrev;
+  buttons = gSharedController.buttonCurrent;
+  down = gSharedController.buttonPressed;
   if ((buttons & BTN_CDOWN) && (buttons & BTN_L) && (buttons & BTN_R))
   {
     Mod_Save();
   }
 
-  if ((buttons & BTN_CUP) && (buttons & BTN_A) && (buttons & BTN_R))
+  if ((buttons & BTN_CUP) && (buttons & BTN_R) && (buttons & BTN_L))
   {
     Mod_Load();
+    return true;
   }
-
-}
-
-void b(void)
-{
-    // @todo: Should probably only allow player 1?
-    /*
-    if ((gTestMessageSet == 0) && (racer->stateFlags & RACER_STATE_FLAGS_400000)) // && ((controller->buttonCurrent & (BTN_CDOWN | BTN_CUP | BTN_CLEFT | BTN_CRIGHT)) == 15))
-    {
-        buttonsCurrent = &gControllers[gPlayerControlPorts[racer->id]].buttonCurrent;
-        // Scrambled slightly so I don't get confused if I see the rom
-        if ((buttonsCurrent & BTN_START))
-        {
-          gTestMessageSet++;
-        }
-    }
-    */
+  return false;
 }

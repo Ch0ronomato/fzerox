@@ -699,8 +699,6 @@ void func_800690FC(void) {
         gControllerReadDataStarted = false;
     }
     gQueuedGameMode = sGamemodeUpdateFuncs[GET_MODE(gGameMode)]();
-    // update the mod
-    Mod_Main();
     func_80068F04();
     switch (gGameModeChangeState) {
         case GAMEMODE_CHANGE_WAIT_TRANSITION_RELOAD:

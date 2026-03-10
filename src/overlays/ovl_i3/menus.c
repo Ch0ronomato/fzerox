@@ -5803,6 +5803,7 @@ Gfx* Menus_Draw(Gfx* gfx) {
                 gfx = Menus_DrawGeneralPause(gfx);
             }
         } else {
+            /*
             sPauseMenuScissorBoxTimer = 60;
             sPauseMenuOptionIndex = 0;
             for (i = 0; i < gNumPlayers; i++) {
@@ -5813,6 +5814,7 @@ Gfx* Menus_Draw(Gfx* gfx) {
                     break;
                 }
             }
+            */
         }
     }
     return gfx;

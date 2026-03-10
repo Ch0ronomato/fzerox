@@ -1,4 +1,4 @@
-static void save_pointer_relocs(void)
+static u32 save_pointer_relocs(u8* out, u32 off)
 {
     /* D_800E12C0 */
     {
@@ -923,10 +923,10 @@ static void save_pointer_relocs(void)
         off = mod_write_bytes(out, off, &arena_index, sizeof(arena_index));
         off = mod_write_bytes(out, off, &offset_val, sizeof(offset_val));
     }
-
+    return off;
 }
 
-static void load_pointer_relocs(void)
+static u32 load_pointer_relocs(const u8* in, u32 off)
 {
     /* D_800E12C0 */
     {
@@ -1521,5 +1521,5 @@ static void load_pointer_relocs(void)
             sWorkingSegmentChunk = NULL;
         }
     }
-
+  return off;
 }

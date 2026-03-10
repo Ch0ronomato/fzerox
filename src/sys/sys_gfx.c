@@ -86,6 +86,7 @@ uintptr_t gUnkContextVramStart;
 uintptr_t gUnkContextVramEnd;
 uintptr_t gAudioContextVramStart;
 uintptr_t gAudioContextVramEnd;
+extern bool Mod_Main();
 
 void func_80067AE0(void) {
     s32 temp_t7;
@@ -177,6 +178,7 @@ void Gfx_SetTask(OSTask* task) {
 extern OSMesgQueue D_800DCAB0;
 extern OSMesgQueue D_800DCAC8;
 extern FrameBuffer* gFrameBuffers[];
+u32 gPendingLoad;
 
 void func_80067D64(void) {
     osRecvMesg(&D_800DCAB0, &D_800DCD10, OS_MESG_BLOCK);
@@ -191,6 +193,10 @@ void func_80067D64(void) {
     while (osDpGetStatus() &
            (DPC_STATUS_DMA_BUSY | DPC_STATUS_CMD_BUSY | DPC_STATUS_PIPE_BUSY | DPC_STATUS_TMEM_BUSY)) {}
 
+    if (Mod_Main())
+    {
+      return; // quit the frame
+    }
     Segment_LoadAssets();
     Transition_SetBackgroundBuffer();
     osViSwapBuffer(gFrameBuffers[D_800DCD00]);
@@ -220,6 +226,10 @@ void func_80067E98(void) {
             osViGetNextFramebuffer() == gFrameBuffers[D_800DCD04]) &&
            retries != 0) {
         retries--;
+    }
+    if (Mod_Main())
+    {
+      return; // quit the frame
     }
 
     Gfx_SetTask(sGfxTask);
