@@ -7,19 +7,10 @@ extern long D_800DCE60;
 extern long gAntiPiracyAddedDifficulty;
 extern long gCupType;
 extern long gDifficulty;
-extern long gGameMode;
-extern short gGameModeChangeState;
-extern signed char gGamePaused;
-extern short gMenuChangeMode;
 extern long gNumPlayers;
-extern long gQueuedGameMode;
-extern signed char gTitleDemoState;
 extern long gTotalLapCount;
-extern unsigned short sTitleDemoCounter;
 extern signed char sTitleDemoCourses[5];
-extern signed char sTitleDemoCoursesState;
 extern long sTitleDemoGameModes[3];
-extern signed char sTitleDemoNumPlayerState;
 extern long sTitleDemoNumPlayers[3];
 static u32 game__game__save(u8* out, u32 off)
 {
@@ -32,19 +23,10 @@ static u32 game__game__save(u8* out, u32 off)
 	off = mod_write_bytes(out, off, &gAntiPiracyAddedDifficulty, 4);
 	off = mod_write_bytes(out, off, &gCupType, 4);
 	off = mod_write_bytes(out, off, &gDifficulty, 4);
-	off = mod_write_bytes(out, off, &gGameMode, 4);
-	off = mod_write_bytes(out, off, &gGameModeChangeState, 2);
-	off = mod_write_bytes(out, off, &gGamePaused, 1);
-	off = mod_write_bytes(out, off, &gMenuChangeMode, 2);
 	off = mod_write_bytes(out, off, &gNumPlayers, 4);
-	off = mod_write_bytes(out, off, &gQueuedGameMode, 4);
-	off = mod_write_bytes(out, off, &gTitleDemoState, 1);
 	off = mod_write_bytes(out, off, &gTotalLapCount, 4);
-	off = mod_write_bytes(out, off, &sTitleDemoCounter, 2);
 	off = mod_write_bytes(out, off, sTitleDemoCourses, 5);
-	off = mod_write_bytes(out, off, &sTitleDemoCoursesState, 1);
 	off = mod_write_bytes(out, off, sTitleDemoGameModes, 24);
-	off = mod_write_bytes(out, off, &sTitleDemoNumPlayerState, 1);
 	off = mod_write_bytes(out, off, sTitleDemoNumPlayers, 24);
 	return off;
 }
@@ -60,19 +42,10 @@ static u32 game__game__load(u8* out, u32 off)
 	off = mod_read_bytes(out, off, &gAntiPiracyAddedDifficulty, 4);
 	off = mod_read_bytes(out, off, &gCupType, 4);
 	off = mod_read_bytes(out, off, &gDifficulty, 4);
-	off = mod_read_bytes(out, off, &gGameMode, 4);
-	off = mod_read_bytes(out, off, &gGameModeChangeState, 2);
-	off = mod_read_bytes(out, off, &gGamePaused, 1);
-	off = mod_read_bytes(out, off, &gMenuChangeMode, 2);
 	off = mod_read_bytes(out, off, &gNumPlayers, 4);
-	off = mod_read_bytes(out, off, &gQueuedGameMode, 4);
-	off = mod_read_bytes(out, off, &gTitleDemoState, 1);
 	off = mod_read_bytes(out, off, &gTotalLapCount, 4);
-	off = mod_read_bytes(out, off, &sTitleDemoCounter, 2);
 	off = mod_read_bytes(out, off, sTitleDemoCourses, 5);
-	off = mod_read_bytes(out, off, &sTitleDemoCoursesState, 1);
 	off = mod_read_bytes(out, off, sTitleDemoGameModes, 24);
-	off = mod_read_bytes(out, off, &sTitleDemoNumPlayerState, 1);
 	off = mod_read_bytes(out, off, sTitleDemoNumPlayers, 24);
 	return off;
 }

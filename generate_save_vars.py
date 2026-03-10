@@ -167,7 +167,9 @@ class GameState:
     def record_pointer(self):
         if "LEAVE_AS_IS" in pointers['pointers'].get(self.Name, ""):
             return False
-        return True
+        if self.Name in set(pointers['skip_vars']):
+            print("Skipping", self.Name)
+        return self.Name not in set(pointers['skip_vars'])
 
     @property
     def pointer_policy(self):
@@ -188,6 +190,8 @@ def generate_pointer_relocs(game_states):
         if not policy or policy == "PTR_LEAVE_AS_IS":
             continue
         if not gs.is_pointer:
+            continue
+        if not gs.record_pointer():
             continue
 
         name = gs.Name

@@ -1,4 +1,4 @@
-static u32 save_pointer_relocs(u8* out, u32 off)
+static void save_pointer_relocs(void)
 {
     /* D_800E12C0 */
     {
@@ -112,34 +112,6 @@ static u32 save_pointer_relocs(u8* out, u32 off)
         off = mod_write_bytes(out, off, &offset_val, sizeof(offset_val));
     }
 
-    /* D_i3_8013DBE8 */
-    {
-        s16 arena_index = -1;
-        u32 offset_val = 0;
-
-        if (D_i3_8013DBE8 != NULL)
-        {
-            if ((uintptr_t)D_i3_8013DBE8 >= gArenaStartPtrs[0] && (uintptr_t)D_i3_8013DBE8 < gArenaEndPtrs[0])
-            {
-                arena_index = 0;
-                offset_val = (u32)((uintptr_t)D_i3_8013DBE8 - gArenaStartPtrs[0]);
-            }
-            else if ((uintptr_t)D_i3_8013DBE8 >= gArenaStartPtrs[1] && (uintptr_t)D_i3_8013DBE8 < gArenaEndPtrs[1])
-            {
-                arena_index = 1;
-                offset_val = (u32)((uintptr_t)D_i3_8013DBE8 - gArenaStartPtrs[1]);
-            }
-            else if ((uintptr_t)D_i3_8013DBE8 >= gArenaStartPtrs[2] && (uintptr_t)D_i3_8013DBE8 < gArenaEndPtrs[2])
-            {
-                arena_index = 2;
-                offset_val = (u32)((uintptr_t)D_i3_8013DBE8 - gArenaStartPtrs[2]);
-            }
-        }
-
-        off = mod_write_bytes(out, off, &arena_index, sizeof(arena_index));
-        off = mod_write_bytes(out, off, &offset_val, sizeof(offset_val));
-    }
-
     /* gCourseVtxPtr */
     {
         s16 arena_index = -1;
@@ -161,34 +133,6 @@ static u32 save_pointer_relocs(u8* out, u32 off)
             {
                 arena_index = 2;
                 offset_val = (u32)((uintptr_t)gCourseVtxPtr - gArenaStartPtrs[2]);
-            }
-        }
-
-        off = mod_write_bytes(out, off, &arena_index, sizeof(arena_index));
-        off = mod_write_bytes(out, off, &offset_val, sizeof(offset_val));
-    }
-
-    /* gCurAudioTask */
-    {
-        s16 arena_index = -1;
-        u32 offset_val = 0;
-
-        if (gCurAudioTask != NULL)
-        {
-            if ((uintptr_t)gCurAudioTask >= gArenaStartPtrs[0] && (uintptr_t)gCurAudioTask < gArenaEndPtrs[0])
-            {
-                arena_index = 0;
-                offset_val = (u32)((uintptr_t)gCurAudioTask - gArenaStartPtrs[0]);
-            }
-            else if ((uintptr_t)gCurAudioTask >= gArenaStartPtrs[1] && (uintptr_t)gCurAudioTask < gArenaEndPtrs[1])
-            {
-                arena_index = 1;
-                offset_val = (u32)((uintptr_t)gCurAudioTask - gArenaStartPtrs[1]);
-            }
-            else if ((uintptr_t)gCurAudioTask >= gArenaStartPtrs[2] && (uintptr_t)gCurAudioTask < gArenaEndPtrs[2])
-            {
-                arena_index = 2;
-                offset_val = (u32)((uintptr_t)gCurAudioTask - gArenaStartPtrs[2]);
             }
         }
 
@@ -357,62 +301,6 @@ static u32 save_pointer_relocs(u8* out, u32 off)
             {
                 arena_index = 2;
                 offset_val = (u32)((uintptr_t)gFastestGhostRacer - gArenaStartPtrs[2]);
-            }
-        }
-
-        off = mod_write_bytes(out, off, &arena_index, sizeof(arena_index));
-        off = mod_write_bytes(out, off, &offset_val, sizeof(offset_val));
-    }
-
-    /* gSramPiHandlePtr */
-    {
-        s16 arena_index = -1;
-        u32 offset_val = 0;
-
-        if (gSramPiHandlePtr != NULL)
-        {
-            if ((uintptr_t)gSramPiHandlePtr >= gArenaStartPtrs[0] && (uintptr_t)gSramPiHandlePtr < gArenaEndPtrs[0])
-            {
-                arena_index = 0;
-                offset_val = (u32)((uintptr_t)gSramPiHandlePtr - gArenaStartPtrs[0]);
-            }
-            else if ((uintptr_t)gSramPiHandlePtr >= gArenaStartPtrs[1] && (uintptr_t)gSramPiHandlePtr < gArenaEndPtrs[1])
-            {
-                arena_index = 1;
-                offset_val = (u32)((uintptr_t)gSramPiHandlePtr - gArenaStartPtrs[1]);
-            }
-            else if ((uintptr_t)gSramPiHandlePtr >= gArenaStartPtrs[2] && (uintptr_t)gSramPiHandlePtr < gArenaEndPtrs[2])
-            {
-                arena_index = 2;
-                offset_val = (u32)((uintptr_t)gSramPiHandlePtr - gArenaStartPtrs[2]);
-            }
-        }
-
-        off = mod_write_bytes(out, off, &arena_index, sizeof(arena_index));
-        off = mod_write_bytes(out, off, &offset_val, sizeof(offset_val));
-    }
-
-    /* sCourseDisp */
-    {
-        s16 arena_index = -1;
-        u32 offset_val = 0;
-
-        if (sCourseDisp != NULL)
-        {
-            if ((uintptr_t)sCourseDisp >= gArenaStartPtrs[0] && (uintptr_t)sCourseDisp < gArenaEndPtrs[0])
-            {
-                arena_index = 0;
-                offset_val = (u32)((uintptr_t)sCourseDisp - gArenaStartPtrs[0]);
-            }
-            else if ((uintptr_t)sCourseDisp >= gArenaStartPtrs[1] && (uintptr_t)sCourseDisp < gArenaEndPtrs[1])
-            {
-                arena_index = 1;
-                offset_val = (u32)((uintptr_t)sCourseDisp - gArenaStartPtrs[1]);
-            }
-            else if ((uintptr_t)sCourseDisp >= gArenaStartPtrs[2] && (uintptr_t)sCourseDisp < gArenaEndPtrs[2])
-            {
-                arena_index = 2;
-                offset_val = (u32)((uintptr_t)sCourseDisp - gArenaStartPtrs[2]);
             }
         }
 
@@ -756,34 +644,6 @@ static u32 save_pointer_relocs(u8* out, u32 off)
         off = mod_write_bytes(out, off, &offset_val, sizeof(offset_val));
     }
 
-    /* sTransitionPalettePtr */
-    {
-        s16 arena_index = -1;
-        u32 offset_val = 0;
-
-        if (sTransitionPalettePtr != NULL)
-        {
-            if ((uintptr_t)sTransitionPalettePtr >= gArenaStartPtrs[0] && (uintptr_t)sTransitionPalettePtr < gArenaEndPtrs[0])
-            {
-                arena_index = 0;
-                offset_val = (u32)((uintptr_t)sTransitionPalettePtr - gArenaStartPtrs[0]);
-            }
-            else if ((uintptr_t)sTransitionPalettePtr >= gArenaStartPtrs[1] && (uintptr_t)sTransitionPalettePtr < gArenaEndPtrs[1])
-            {
-                arena_index = 1;
-                offset_val = (u32)((uintptr_t)sTransitionPalettePtr - gArenaStartPtrs[1]);
-            }
-            else if ((uintptr_t)sTransitionPalettePtr >= gArenaStartPtrs[2] && (uintptr_t)sTransitionPalettePtr < gArenaEndPtrs[2])
-            {
-                arena_index = 2;
-                offset_val = (u32)((uintptr_t)sTransitionPalettePtr - gArenaStartPtrs[2]);
-            }
-        }
-
-        off = mod_write_bytes(out, off, &arena_index, sizeof(arena_index));
-        off = mod_write_bytes(out, off, &offset_val, sizeof(offset_val));
-    }
-
     /* sTunnelFogColors */
     {
         s16 arena_index = -1;
@@ -923,10 +783,10 @@ static u32 save_pointer_relocs(u8* out, u32 off)
         off = mod_write_bytes(out, off, &arena_index, sizeof(arena_index));
         off = mod_write_bytes(out, off, &offset_val, sizeof(offset_val));
     }
-    return off;
+
 }
 
-static u32 load_pointer_relocs(const u8* in, u32 off)
+static void load_pointer_relocs(void)
 {
     /* D_800E12C0 */
     {
@@ -1000,24 +860,6 @@ static u32 load_pointer_relocs(const u8* in, u32 off)
         }
     }
 
-    /* D_i3_8013DBE8 */
-    {
-        s16 arena_index;
-        u32 offset_val;
-
-        off = mod_read_bytes(in, off, &arena_index, sizeof(arena_index));
-        off = mod_read_bytes(in, off, &offset_val, sizeof(offset_val));
-
-        if (arena_index >= 0)
-        {
-            D_i3_8013DBE8 = (void*)(gArenaStartPtrs[arena_index] + offset_val);
-        }
-        else
-        {
-            D_i3_8013DBE8 = NULL;
-        }
-    }
-
     /* gCourseVtxPtr */
     {
         s16 arena_index;
@@ -1033,24 +875,6 @@ static u32 load_pointer_relocs(const u8* in, u32 off)
         else
         {
             gCourseVtxPtr = NULL;
-        }
-    }
-
-    /* gCurAudioTask */
-    {
-        s16 arena_index;
-        u32 offset_val;
-
-        off = mod_read_bytes(in, off, &arena_index, sizeof(arena_index));
-        off = mod_read_bytes(in, off, &offset_val, sizeof(offset_val));
-
-        if (arena_index >= 0)
-        {
-            gCurAudioTask = (void*)(gArenaStartPtrs[arena_index] + offset_val);
-        }
-        else
-        {
-            gCurAudioTask = NULL;
         }
     }
 
@@ -1159,42 +983,6 @@ static u32 load_pointer_relocs(const u8* in, u32 off)
         else
         {
             gFastestGhostRacer = NULL;
-        }
-    }
-
-    /* gSramPiHandlePtr */
-    {
-        s16 arena_index;
-        u32 offset_val;
-
-        off = mod_read_bytes(in, off, &arena_index, sizeof(arena_index));
-        off = mod_read_bytes(in, off, &offset_val, sizeof(offset_val));
-
-        if (arena_index >= 0)
-        {
-            gSramPiHandlePtr = (void*)(gArenaStartPtrs[arena_index] + offset_val);
-        }
-        else
-        {
-            gSramPiHandlePtr = NULL;
-        }
-    }
-
-    /* sCourseDisp */
-    {
-        s16 arena_index;
-        u32 offset_val;
-
-        off = mod_read_bytes(in, off, &arena_index, sizeof(arena_index));
-        off = mod_read_bytes(in, off, &offset_val, sizeof(offset_val));
-
-        if (arena_index >= 0)
-        {
-            sCourseDisp = (void*)(gArenaStartPtrs[arena_index] + offset_val);
-        }
-        else
-        {
-            sCourseDisp = NULL;
         }
     }
 
@@ -1414,24 +1202,6 @@ static u32 load_pointer_relocs(const u8* in, u32 off)
         }
     }
 
-    /* sTransitionPalettePtr */
-    {
-        s16 arena_index;
-        u32 offset_val;
-
-        off = mod_read_bytes(in, off, &arena_index, sizeof(arena_index));
-        off = mod_read_bytes(in, off, &offset_val, sizeof(offset_val));
-
-        if (arena_index >= 0)
-        {
-            sTransitionPalettePtr = (void*)(gArenaStartPtrs[arena_index] + offset_val);
-        }
-        else
-        {
-            sTransitionPalettePtr = NULL;
-        }
-    }
-
     /* sTunnelFogColors */
     {
         s16 arena_index;
@@ -1521,5 +1291,5 @@ static u32 load_pointer_relocs(const u8* in, u32 off)
             sWorkingSegmentChunk = NULL;
         }
     }
-  return off;
+
 }

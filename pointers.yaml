@@ -95,3 +95,89 @@ pointers:
   # --- Mostly-null/unused ---
   sUnusedHandler: PTR_LEAVE_AS_IS
   D_i3_8013DBE8: PTR_RESTORE_REF
+
+skip_vars:
+
+  # --- Game mode / engine state machine ---
+  - gGameMode
+  - gQueuedGameMode
+  - gGameModeChangeState
+  - gMenuChangeMode
+  - gGamePaused
+  - gTitleDemoState
+  - sTitleDemoNumPlayerState
+  - sTitleDemoCoursesState
+  - sTitleDemoCounter
+
+  # --- Transition system (entire ovl_i2/transition.c domain) ---
+  - sTransition
+  - gTransitionState
+  - sTransitionTypeArgument
+  - sTransitionTypeWithArgument
+  - sWipePos
+  - sTiledPerspectiveScale
+  - sTransitionIntermediateFillBlack
+  - sTransitionPalettePtr
+  - sTransitionPalette
+  - sSurroundingTilesRelativeIndex
+  - sStripMoveSpeed
+  - sSurroundingTileSkipChanceMask
+
+  # --- Controller transient state ---
+  - gInputPressed
+  - gInputButtonPressed
+  - gRetriggeredButtonCurrentPressed
+
+  # --- SRAM / PI / OS handles ---
+  - sSramIoMesg
+  - sSramPiHandle
+  - gSramPiHandlePtr
+
+  # --- Audio runtime globals ---
+  - gCurAudioTask
+  - gAudioContextInitialized
+  - sAudioPauseStatus
+  - sBgmPlayState
+  - sAudioPlayerMode
+  - sAudioEnemyEngineStatus
+  - sAudioClosestRacerId
+  - sAudioPreviousClosestRacerId
+  - sAudioClosestRacerDistance
+  - sAudioPlayerSEStack
+  - sAudioLevelSEStack
+  - sActivePlayerLevelSE
+
+  # --- Rendering pipeline / display list control ---
+  - sCourseDisp
+  - D_i3_8013DBE0
+  - D_i3_8013DBE8
+  - D_i3_80141900
+  - D_i3_80141904
+
+  # --- Mode transition helpers ---
+  - D_800CD16C
+  - gControllerReadDataStarted
+
+  # --- Runtime flags that should remain live ---
+  - sRaceFinishSaveTriggered
+  - sMenuIsBusy
+  - sMenuOptionTriggered
+  - sSaveGhostMenuOpen
+
+  # --- Font / static pointer tables (should never change) ---
+  - sFont1CompTexInfos
+  - sFont2CompTexInfos
+  - sFont3CompTexInfos
+  - sFont4CompTexInfos
+  - sFont5CompTexInfos
+  - sFont6CompTexInfos
+  - sMachineStatValueCompTexInfos
+  - sMachineWeightDigitCompTexInfos
+  - sGamemodeInitFuncs
+  - sGamemodeUpdateFuncs
+  - sGamemodeDrawFuncs
+  - sMachineLoadTexturesFuncs
+  - sMachineDrawFuncs
+  - sCharacterBehaviorFuncs
+  - sBackwardChunkGroupDrawFuncs
+  - sForwardChunkGroupDrawFuncs

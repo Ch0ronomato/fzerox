@@ -1,6 +1,4 @@
 extern long D_80141900;
-extern Gfx D_i3_8013DBE0[1];
-extern short * D_i3_8013DBE8;
 extern long D_i3_8013DBEC;
 extern float D_i3_8013DBF0[5];
 extern float D_i3_8013DC04[5];
@@ -19,7 +17,6 @@ extern float D_i3_8013EC30[24];
 extern float D_i3_8013ED08[2];
 extern float D_i3_8013ED10[3];
 extern float D_i3_8013ED1C[3];
-extern long D_i3_80141904;
 extern long D_i3_8014190C;
 extern long D_i3_80141914;
 extern long D_i3_80141990;
@@ -60,8 +57,6 @@ extern long sZodaRacerId;
 static u32 overlays__ovl_i3__cpu__save(u8* out, u32 off)
 {
 	off = mod_write_bytes(out, off, &D_80141900, 4);
-	off = mod_write_bytes(out, off, D_i3_8013DBE0, 16);
-	off = mod_write_bytes(out, off, &D_i3_8013DBE8, 8);
 	off = mod_write_bytes(out, off, &D_i3_8013DBEC, 4);
 	off = mod_write_bytes(out, off, D_i3_8013DBF0, 20);
 	off = mod_write_bytes(out, off, D_i3_8013DC04, 20);
@@ -80,7 +75,6 @@ static u32 overlays__ovl_i3__cpu__save(u8* out, u32 off)
 	off = mod_write_bytes(out, off, D_i3_8013ED08, 8);
 	off = mod_write_bytes(out, off, D_i3_8013ED10, 12);
 	off = mod_write_bytes(out, off, D_i3_8013ED1C, 12);
-	off = mod_write_bytes(out, off, &D_i3_80141904, 4);
 	off = mod_write_bytes(out, off, &D_i3_8014190C, 4);
 	off = mod_write_bytes(out, off, &D_i3_80141914, 4);
 	off = mod_write_bytes(out, off, &D_i3_80141990, 4);
@@ -124,8 +118,6 @@ static u32 overlays__ovl_i3__cpu__save(u8* out, u32 off)
 static u32 overlays__ovl_i3__cpu__load(u8* out, u32 off)
 {
 	off = mod_read_bytes(out, off, &D_80141900, 4);
-	off = mod_read_bytes(out, off, D_i3_8013DBE0, 16);
-	off = mod_read_bytes(out, off, &D_i3_8013DBE8, 8);
 	off = mod_read_bytes(out, off, &D_i3_8013DBEC, 4);
 	off = mod_read_bytes(out, off, D_i3_8013DBF0, 20);
 	off = mod_read_bytes(out, off, D_i3_8013DC04, 20);
@@ -144,7 +136,6 @@ static u32 overlays__ovl_i3__cpu__load(u8* out, u32 off)
 	off = mod_read_bytes(out, off, D_i3_8013ED08, 8);
 	off = mod_read_bytes(out, off, D_i3_8013ED10, 12);
 	off = mod_read_bytes(out, off, D_i3_8013ED1C, 12);
-	off = mod_read_bytes(out, off, &D_i3_80141904, 4);
 	off = mod_read_bytes(out, off, &D_i3_8014190C, 4);
 	off = mod_read_bytes(out, off, &D_i3_80141914, 4);
 	off = mod_read_bytes(out, off, &D_i3_80141990, 4);
