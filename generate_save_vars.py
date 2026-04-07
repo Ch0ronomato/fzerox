@@ -78,37 +78,25 @@ class GameState:
     def extern(self) -> str:
         t = self._type.get_canonical()
         name = self.Name
-
-        # Array case: rebuild declarator correctly, including multi-d arrays
-        if t.kind in (clang.cindex.TypeKind.CONSTANTARRAY, clang.cindex.TypeKind.INCOMPLETEARRAY, clang.cindex.TypeKind.VARIABLEARRAY):
+        type_spelling = t.spelling
+        if t.kind in (clang.cindex.TypeKind.CONSTANTARRAY,
+                      clang.cindex.TypeKind.INCOMPLETEARRAY,
+                      clang.cindex.TypeKind.VARIABLEARRAY):
             base, dims = _collect_array_dims(t)
-
-            # Replace unknown dims (-1) if possible (only for the first incomplete layer).
-            # NOTE: For true incomplete like `int x[]`, clang gives INCOMPLETEARRAY for the outermost.
-            # If you computed Size, we can infer that outer count from Size/sizeof(element) ONLY if exactly 1 incomplete layer.
-            if -1 in dims:
-                # Only attempt inference if exactly one -1 and we can size base.
-                if dims.count(-1) == 1:
-                    idx = dims.index(-1)
-                    base_size = base.get_size()
-                    if base_size > 0:
-                        # bytes per element includes any remaining inner dimensions already folded into base
-                        # (because base is after peeling all array layers)
-                        inferred = self.Size // base_size
-                        dims[idx] = inferred
-
-            # Build `name[dim0][dim1]...`
             decl = name
             for d in dims:
                 if d is None or d < 0:
                     decl += "[]"
                 else:
                     decl += f"[{d}]"
-
-            return f"extern {base.spelling} {decl};"
-
-        # Non-array: simple
-        return f"extern {t.spelling} {name};"
+            name = decl
+            type_spelling = base.spelling
+        if self.is_function_pointer or r"(*)" in type_spelling:
+            # format is a bit different here.
+            # extern <return type> (*Name[size])(args...)
+            return "extern " + type_spelling.replace(r"(*)", rf"(*{name})") + ";"
+        else:
+            return f"extern {type_spelling} {name};"
     # -------------------------
     # save emission
     # -------------------------
@@ -348,8 +336,6 @@ for file, ast in asts.items():
             size = fix_size(node)
             if (size < 0):
                 continue
-            # lots of output here
-            print(file, node.spelling, node.type.spelling, size)
             total_size += size
             usage.append(new_game_state(node.location.file, node.spelling,
                                         node.type.spelling, size, node))
@@ -405,12 +391,14 @@ with open("src/mod/save_runner.c.inc", "w") as f:
 
 with open("src/mod/pointer_relocs.c.inc", "w") as fw:
     save_lines, load_lines = generate_pointer_relocs(usage)
-    fw.write("static void save_pointer_relocs(void)\n{\n")
+    fw.write("static u32 save_pointer_relocs(u8* out, u32 off)\n{\n")
     fw.write("\n".join(save_lines))
+    fw.write("\n\treturn off;")
     fw.write("\n}\n\n")
 
-    fw.write("static void load_pointer_relocs(void)\n{\n")
+    fw.write("static u32 load_pointer_relocs(u8* in, u32 off)\n{\n")
     fw.write("\n".join(load_lines))
+    fw.write("\n\treturn off;")
     fw.write("\n}\n")
 
 # ---- Example usage after you build `usage` ----
