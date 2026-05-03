@@ -60,16 +60,6 @@ static u32 game__camera__save(u8* out, u32 off)
 	off = mod_write_bytes(out, off, &D_800CDA90, 4);
 	off = mod_write_bytes(out, off, &D_800CDA94, 4);
 	off = mod_write_bytes(out, off, &D_800CDA98, 4);
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	off = mod_write_bytes(out, off, &D_800E5E8C, 2);
 	off = mod_write_bytes(out, off, gCameras, 2048);
 	off = mod_write_bytes(out, off, gFinishedSuccessScript, 80);
@@ -86,8 +76,6 @@ static u32 game__camera__save(u8* out, u32 off)
 	off = mod_write_bytes(out, off, &gScissorBoxTopHalf, 32);
 	off = mod_write_bytes(out, off, &gScissorBoxTopLeftQuarter, 32);
 	off = mod_write_bytes(out, off, &gScissorBoxTopRightQuarter, 32);
-	
-	
 	off = mod_write_bytes(out, off, kFourCameraScissorBoxTypes, 32);
 	off = mod_write_bytes(out, off, kRegularCameraRaceSettings, 48);
 	off = mod_write_bytes(out, off, kSingleCameraScissorBoxTypes, 8);
@@ -120,16 +108,6 @@ static u32 game__camera__load(u8* out, u32 off)
 	off = mod_read_bytes(out, off, &D_800CDA90, 4);
 	off = mod_read_bytes(out, off, &D_800CDA94, 4);
 	off = mod_read_bytes(out, off, &D_800CDA98, 4);
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	off = mod_read_bytes(out, off, &D_800E5E8C, 2);
 	off = mod_read_bytes(out, off, gCameras, 2048);
 	off = mod_read_bytes(out, off, gFinishedSuccessScript, 80);
@@ -146,8 +124,6 @@ static u32 game__camera__load(u8* out, u32 off)
 	off = mod_read_bytes(out, off, &gScissorBoxTopHalf, 32);
 	off = mod_read_bytes(out, off, &gScissorBoxTopLeftQuarter, 32);
 	off = mod_read_bytes(out, off, &gScissorBoxTopRightQuarter, 32);
-	
-	
 	off = mod_read_bytes(out, off, kFourCameraScissorBoxTypes, 32);
 	off = mod_read_bytes(out, off, kRegularCameraRaceSettings, 48);
 	off = mod_read_bytes(out, off, kSingleCameraScissorBoxTypes, 8);

@@ -152,11 +152,7 @@ static u32 game__racer__save(u8* out, u32 off)
 	off = mod_write_bytes(out, off, &gCpuRacersRetired, 2);
 	off = mod_write_bytes(out, off, &gCurrentTimeAttackHasMaxSpeed, 2);
 	off = mod_write_bytes(out, off, &gCurrentTimeAttackRecordPosition, 2);
-	off = mod_write_bytes(out, off, &gEffectsVtxEndPtr, 8);
-	off = mod_write_bytes(out, off, &gEffectsVtxPtr, 8);
 	off = mod_write_bytes(out, off, &gEnableRaceSfx, 2);
-	off = mod_write_bytes(out, off, &gFastestGhost, 8);
-	off = mod_write_bytes(out, off, &gFastestGhostRacer, 8);
 	off = mod_write_bytes(out, off, gGhostRacers, 264);
 	off = mod_write_bytes(out, off, gGhosts, 48864);
 	off = mod_write_bytes(out, off, gMachines, 660);
@@ -171,7 +167,6 @@ static u32 game__racer__save(u8* out, u32 off)
 	off = mod_write_bytes(out, off, &gPracticeBestLap, 4);
 	off = mod_write_bytes(out, off, &gRaceIntroTimer, 4);
 	off = mod_write_bytes(out, off, gRacePositionPoints, 240);
-	off = mod_write_bytes(out, off, gRacersByPosition, 240);
 	off = mod_write_bytes(out, off, &gRacersFinished, 2);
 	off = mod_write_bytes(out, off, &gRacersKOd, 2);
 	off = mod_write_bytes(out, off, &gRacersRetired, 2);
@@ -192,13 +187,10 @@ static u32 game__racer__save(u8* out, u32 off)
 	off = mod_write_bytes(out, off, &sEnergyRefillScale, 4);
 	off = mod_write_bytes(out, off, sGhostReplayRecordingBuffer, 16200);
 	off = mod_write_bytes(out, off, &sGhostReplayRecordingEnd, 4);
-	off = mod_write_bytes(out, off, &sGhostReplayRecordingPtr, 8);
 	off = mod_write_bytes(out, off, &sGhostReplayRecordingSize, 4);
 	off = mod_write_bytes(out, off, &sInitialBoostTimer, 4);
 	off = mod_write_bytes(out, off, &sLastMultiplayerPlayerCount, 2);
 	off = mod_write_bytes(out, off, &sLastMultiplayerTotalRacerCount, 2);
-	off = mod_write_bytes(out, off, &sLastRacer, 8);
-	off = mod_write_bytes(out, off, &sPipeFogColors, 8);
 	off = mod_write_bytes(out, off, &sRaceFrameCount, 4);
 	off = mod_write_bytes(out, off, sRacerPairInfo, 13920);
 	off = mod_write_bytes(out, off, sRecordsMachineIndices, 7);
@@ -206,9 +198,7 @@ static u32 game__racer__save(u8* out, u32 off)
 	off = mod_write_bytes(out, off, &sReplayRecordPosX, 4);
 	off = mod_write_bytes(out, off, &sReplayRecordPosY, 4);
 	off = mod_write_bytes(out, off, &sReplayRecordPosZ, 4);
-	off = mod_write_bytes(out, off, &sRivalRacer, 8);
 	off = mod_write_bytes(out, off, &sSpunOutRacers, 2);
-	off = mod_write_bytes(out, off, &sTunnelFogColors, 8);
 	off = mod_write_bytes(out, off, sVenuePipeFogColors, 240);
 	off = mod_write_bytes(out, off, sVenueTunnelFogColors, 240);
 	off = mod_write_bytes(out, off, sVsRacePositionPoints, 32);
@@ -263,11 +253,7 @@ static u32 game__racer__load(u8* out, u32 off)
 	off = mod_read_bytes(out, off, &gCpuRacersRetired, 2);
 	off = mod_read_bytes(out, off, &gCurrentTimeAttackHasMaxSpeed, 2);
 	off = mod_read_bytes(out, off, &gCurrentTimeAttackRecordPosition, 2);
-	off = mod_read_bytes(out, off, &gEffectsVtxEndPtr, 8);
-	off = mod_read_bytes(out, off, &gEffectsVtxPtr, 8);
 	off = mod_read_bytes(out, off, &gEnableRaceSfx, 2);
-	off = mod_read_bytes(out, off, &gFastestGhost, 8);
-	off = mod_read_bytes(out, off, &gFastestGhostRacer, 8);
 	off = mod_read_bytes(out, off, gGhostRacers, 264);
 	off = mod_read_bytes(out, off, gGhosts, 48864);
 	off = mod_read_bytes(out, off, gMachines, 660);
@@ -282,7 +268,6 @@ static u32 game__racer__load(u8* out, u32 off)
 	off = mod_read_bytes(out, off, &gPracticeBestLap, 4);
 	off = mod_read_bytes(out, off, &gRaceIntroTimer, 4);
 	off = mod_read_bytes(out, off, gRacePositionPoints, 240);
-	off = mod_read_bytes(out, off, gRacersByPosition, 240);
 	off = mod_read_bytes(out, off, &gRacersFinished, 2);
 	off = mod_read_bytes(out, off, &gRacersKOd, 2);
 	off = mod_read_bytes(out, off, &gRacersRetired, 2);
@@ -303,13 +288,10 @@ static u32 game__racer__load(u8* out, u32 off)
 	off = mod_read_bytes(out, off, &sEnergyRefillScale, 4);
 	off = mod_read_bytes(out, off, sGhostReplayRecordingBuffer, 16200);
 	off = mod_read_bytes(out, off, &sGhostReplayRecordingEnd, 4);
-	off = mod_read_bytes(out, off, &sGhostReplayRecordingPtr, 8);
 	off = mod_read_bytes(out, off, &sGhostReplayRecordingSize, 4);
 	off = mod_read_bytes(out, off, &sInitialBoostTimer, 4);
 	off = mod_read_bytes(out, off, &sLastMultiplayerPlayerCount, 2);
 	off = mod_read_bytes(out, off, &sLastMultiplayerTotalRacerCount, 2);
-	off = mod_read_bytes(out, off, &sLastRacer, 8);
-	off = mod_read_bytes(out, off, &sPipeFogColors, 8);
 	off = mod_read_bytes(out, off, &sRaceFrameCount, 4);
 	off = mod_read_bytes(out, off, sRacerPairInfo, 13920);
 	off = mod_read_bytes(out, off, sRecordsMachineIndices, 7);
@@ -317,9 +299,7 @@ static u32 game__racer__load(u8* out, u32 off)
 	off = mod_read_bytes(out, off, &sReplayRecordPosX, 4);
 	off = mod_read_bytes(out, off, &sReplayRecordPosY, 4);
 	off = mod_read_bytes(out, off, &sReplayRecordPosZ, 4);
-	off = mod_read_bytes(out, off, &sRivalRacer, 8);
 	off = mod_read_bytes(out, off, &sSpunOutRacers, 2);
-	off = mod_read_bytes(out, off, &sTunnelFogColors, 8);
 	off = mod_read_bytes(out, off, sVenuePipeFogColors, 240);
 	off = mod_read_bytes(out, off, sVenueTunnelFogColors, 240);
 	off = mod_read_bytes(out, off, sVsRacePositionPoints, 32);

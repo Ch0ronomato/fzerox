@@ -62,7 +62,6 @@ extern long sPlayerWinnerLoserFinishGameoverTimer[4];
 extern short sPlayersVsSlotPositions[5][4][2];
 extern long sRaceMenuDimensions[48];
 extern long sRaceMenuOptionIndex;
-extern void * sRaceMenuTextures[24];
 extern long sResultsTimesLapLeft;
 extern long sResultsTimesLapLeftFromLap;
 extern long sResultsTimesSpeed;
@@ -126,7 +125,6 @@ static u32 overlays__ovl_i3__menus__save(u8* out, u32 off)
 	off = mod_write_bytes(out, off, &sFastestGhostIndex, 4);
 	off = mod_write_bytes(out, off, &sFastestGhostRacerLapDistance, 4);
 	off = mod_write_bytes(out, off, &sFastestGhostRacerLapsCompletedDistance, 4);
-	off = mod_write_bytes(out, off, &sFastestGhostRacerRacer, 8);
 	off = mod_write_bytes(out, off, &sFastestGhostTime, 4);
 	off = mod_write_bytes(out, off, sFinishGameoverRotation, 16);
 	off = mod_write_bytes(out, off, sFinishGameoverRotationSpeed, 16);
@@ -140,8 +138,6 @@ static u32 overlays__ovl_i3__menus__save(u8* out, u32 off)
 	off = mod_write_bytes(out, off, &sGpResultsEndMenuOptionIndex, 4);
 	off = mod_write_bytes(out, off, &sGpResultsEndMenuScissorBoxTimer, 4);
 	off = mod_write_bytes(out, off, &sGpResultsRankingScrollPosition, 4);
-	off = mod_write_bytes(out, off, &sLoserPalette, 8);
-	off = mod_write_bytes(out, off, &sLoserTexture, 8);
 	off = mod_write_bytes(out, off, &sMenuHighlightedOptionMoveTimer, 4);
 	off = mod_write_bytes(out, off, &sMenuRaceIntroTimer, 4);
 	off = mod_write_bytes(out, off, &sMenuStateFlags, 4);
@@ -168,7 +164,6 @@ static u32 overlays__ovl_i3__menus__save(u8* out, u32 off)
 	off = mod_write_bytes(out, off, sPlayersVsSlotPositions, 80);
 	off = mod_write_bytes(out, off, sRaceMenuDimensions, 384);
 	off = mod_write_bytes(out, off, &sRaceMenuOptionIndex, 4);
-	off = mod_write_bytes(out, off, sRaceMenuTextures, 192);
 	off = mod_write_bytes(out, off, &sResultsTimesLapLeft, 4);
 	off = mod_write_bytes(out, off, &sResultsTimesLapLeftFromLap, 4);
 	off = mod_write_bytes(out, off, &sResultsTimesSpeed, 4);
@@ -176,8 +171,6 @@ static u32 overlays__ovl_i3__menus__save(u8* out, u32 off)
 	off = mod_write_bytes(out, off, &sResultsTimesStartTopOffset, 4);
 	off = mod_write_bytes(out, off, &sResultsTimesTop, 4);
 	off = mod_write_bytes(out, off, &sResultsTimesVerticalSpacing, 4);
-	off = mod_write_bytes(out, off, &sRetirePalette, 8);
-	off = mod_write_bytes(out, off, &sRetireTexture, 8);
 	off = mod_write_bytes(out, off, &sSaveGhostMenuOptionIndex, 4);
 	off = mod_write_bytes(out, off, &sSaveGhostMenuOptionState, 4);
 	off = mod_write_bytes(out, off, &sSaveGhostMenuOptionsScissorBoxTimer, 4);
@@ -201,13 +194,11 @@ static u32 overlays__ovl_i3__menus__save(u8* out, u32 off)
 	off = mod_write_bytes(out, off, sVsSlotCooldownTimer, 8);
 	off = mod_write_bytes(out, off, sVsSlotCurrentSlotState, 8);
 	off = mod_write_bytes(out, off, sVsSlotInitialSpeed, 12);
-	off = mod_write_bytes(out, off, sVsSlotPortraits, 192);
+	off = mod_write_bytes(out, off, sVsSlotPortraits, 96);
 	off = mod_write_bytes(out, off, sVsSlotResultIndex, 24);
 	off = mod_write_bytes(out, off, sVsSlotResultIndexToPortraitResult, 48);
 	off = mod_write_bytes(out, off, sVsSlotScrollPosition, 48);
 	off = mod_write_bytes(out, off, sVsSlotSpeed, 48);
-	off = mod_write_bytes(out, off, &sWinnerPalette, 8);
-	off = mod_write_bytes(out, off, &sWinnerTexture, 8);
 	return off;
 }
 
@@ -235,7 +226,6 @@ static u32 overlays__ovl_i3__menus__load(u8* out, u32 off)
 	off = mod_read_bytes(out, off, &sFastestGhostIndex, 4);
 	off = mod_read_bytes(out, off, &sFastestGhostRacerLapDistance, 4);
 	off = mod_read_bytes(out, off, &sFastestGhostRacerLapsCompletedDistance, 4);
-	off = mod_read_bytes(out, off, &sFastestGhostRacerRacer, 8);
 	off = mod_read_bytes(out, off, &sFastestGhostTime, 4);
 	off = mod_read_bytes(out, off, sFinishGameoverRotation, 16);
 	off = mod_read_bytes(out, off, sFinishGameoverRotationSpeed, 16);
@@ -249,8 +239,6 @@ static u32 overlays__ovl_i3__menus__load(u8* out, u32 off)
 	off = mod_read_bytes(out, off, &sGpResultsEndMenuOptionIndex, 4);
 	off = mod_read_bytes(out, off, &sGpResultsEndMenuScissorBoxTimer, 4);
 	off = mod_read_bytes(out, off, &sGpResultsRankingScrollPosition, 4);
-	off = mod_read_bytes(out, off, &sLoserPalette, 8);
-	off = mod_read_bytes(out, off, &sLoserTexture, 8);
 	off = mod_read_bytes(out, off, &sMenuHighlightedOptionMoveTimer, 4);
 	off = mod_read_bytes(out, off, &sMenuRaceIntroTimer, 4);
 	off = mod_read_bytes(out, off, &sMenuStateFlags, 4);
@@ -277,7 +265,6 @@ static u32 overlays__ovl_i3__menus__load(u8* out, u32 off)
 	off = mod_read_bytes(out, off, sPlayersVsSlotPositions, 80);
 	off = mod_read_bytes(out, off, sRaceMenuDimensions, 384);
 	off = mod_read_bytes(out, off, &sRaceMenuOptionIndex, 4);
-	off = mod_read_bytes(out, off, sRaceMenuTextures, 192);
 	off = mod_read_bytes(out, off, &sResultsTimesLapLeft, 4);
 	off = mod_read_bytes(out, off, &sResultsTimesLapLeftFromLap, 4);
 	off = mod_read_bytes(out, off, &sResultsTimesSpeed, 4);
@@ -285,8 +272,6 @@ static u32 overlays__ovl_i3__menus__load(u8* out, u32 off)
 	off = mod_read_bytes(out, off, &sResultsTimesStartTopOffset, 4);
 	off = mod_read_bytes(out, off, &sResultsTimesTop, 4);
 	off = mod_read_bytes(out, off, &sResultsTimesVerticalSpacing, 4);
-	off = mod_read_bytes(out, off, &sRetirePalette, 8);
-	off = mod_read_bytes(out, off, &sRetireTexture, 8);
 	off = mod_read_bytes(out, off, &sSaveGhostMenuOptionIndex, 4);
 	off = mod_read_bytes(out, off, &sSaveGhostMenuOptionState, 4);
 	off = mod_read_bytes(out, off, &sSaveGhostMenuOptionsScissorBoxTimer, 4);
@@ -310,12 +295,10 @@ static u32 overlays__ovl_i3__menus__load(u8* out, u32 off)
 	off = mod_read_bytes(out, off, sVsSlotCooldownTimer, 8);
 	off = mod_read_bytes(out, off, sVsSlotCurrentSlotState, 8);
 	off = mod_read_bytes(out, off, sVsSlotInitialSpeed, 12);
-	off = mod_read_bytes(out, off, sVsSlotPortraits, 192);
+	off = mod_read_bytes(out, off, sVsSlotPortraits, 96);
 	off = mod_read_bytes(out, off, sVsSlotResultIndex, 24);
 	off = mod_read_bytes(out, off, sVsSlotResultIndexToPortraitResult, 48);
 	off = mod_read_bytes(out, off, sVsSlotScrollPosition, 48);
 	off = mod_read_bytes(out, off, sVsSlotSpeed, 48);
-	off = mod_read_bytes(out, off, &sWinnerPalette, 8);
-	off = mod_read_bytes(out, off, &sWinnerTexture, 8);
 	return off;
 }

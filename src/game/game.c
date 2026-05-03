@@ -444,7 +444,7 @@ extern OSMesgQueue gSerialEventQueue;
 extern CourseInfo* gCurrentCourseInfo;
 extern u8 D_i2_80106F14[];
 extern void Mod_Entry(void);
-extern void Mod_Main(void);
+extern bool Mod_Main(void);
 
 void func_800690FC(void) {
 #ifdef EXPANSION_KIT

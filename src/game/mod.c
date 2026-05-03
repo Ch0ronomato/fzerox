@@ -7,19 +7,23 @@
 #include "PR/os_pi.h"
 #include "fzx_bordered_box.h"
 #include "fzx_camera.h"
+#include "fzx_game.h"
 #include "fzx_effects.h"
 #include "fzx_machine.h"
 #include "fzx_math.h"
 #include "fzx_object.h"
+#include "fzx_course.h"
+#include "fzx_save.h"
 #include "fzx_racer.h"
+#include "functions.h"
 #include "src/audio/rom/lib/audio.h"
 #include "src/overlays/ovl_i2/transition.h"
 #include "src/overlays/ovl_i3/background.h"
 #include "src/overlays/ovl_i3/hud.h"
 #include "src/overlays/ovl_i3/ovl_i3.h"
 #include "src/overlays/ovl_i3/records_entry.h"
+#include "segment_symbols.h"
 #include "unk_structs.h"
-#include "controller.h"
 
 typedef struct unk_800CF528 {
     s32 texture;
@@ -50,13 +54,18 @@ typedef struct unk_800F8958 {
     s32 loadVtxIndex;
 } unk_800F8958; // size = 0x30
 
-char k = '1';
 typedef struct SegmentChunkGroup {
     SegmentChunk* startChunk;
     SegmentChunk* endChunk;
     f32 averageDepth;
     s32 drawState;
 } SegmentChunkGroup; // size = 0x10
+
+#ifndef EXPANSION_KIT
+#define MOD_SEGMENT_CHUNK_GROUP_COUNT 64
+#else
+#define MOD_SEGMENT_CHUNK_GROUP_COUNT 96
+#endif
 
 static u32 mod_write_bytes(u8* out, u32 off, void* src, u32 size) {
     memcpy(out + off, src, size);
@@ -71,13 +80,20 @@ static u32 mod_read_bytes(u8* in, u32 off, void* dst, u32 size) {
 // generated methods
 #include "src/mod/save_runner.c.inc"
 
-#define KNOWN_SIZE 184630
 #define SECTOR_SIZE 512
-#define LBA_OFFSET  2000
+#define LBA_OFFSET 2000
+#define MOD_MAGIC_SIZE 7
+#define MOD_METADATA_SIZE 12
+#define MOD_FORMAT_VERSION 1
+#define MOD_ARENA_STATE_SIZE (3 * 2 * sizeof(u32))
 
 __attribute__((aligned(16)))
-s8 gSaveStateMemory[KNOWN_SIZE];
+s8 gSaveStateMemory[MOD_HEADER_BUFFER_SIZE];
 bool gHaveWrote = false;
+
+static const u8 sModMagic[MOD_MAGIC_SIZE] = { 'D', 'E', 'A', 'D', 'B', 'E', 'E' };
+static void WriteRegionToSD(const void* src_, u32 size, u32* io_lba);
+static void ReadRegionFromSD(void* dst_, u32 size, u32* io_lba);
 
 /* Size of cartridge SDRAM */
 extern u32 cart_size;
@@ -87,7 +103,641 @@ extern int cart_type;
 
 extern uintptr_t gArenaStartPtrs[3];
 extern uintptr_t gArenaEndPtrs[3];
+static uintptr_t sModArenaBasePtrs[3];
+static uintptr_t sModArenaLimitPtrs[3];
+#define gArenaStartPtrs sModArenaBasePtrs
+#define gArenaEndPtrs sModArenaLimitPtrs
 #include "src/mod/pointer_relocs.c.inc"
+#undef gArenaStartPtrs
+#undef gArenaEndPtrs
+
+extern CourseInfo gCourseInfos[56];
+extern Controller gControllers[];
+extern CourseEffectsInfo gCourseEffectsInfo;
+extern CourseEffectsInfo* D_800E12C0;
+extern CourseInfo* gCurrentCourseInfo;
+extern Background sBackgrounds[4];
+extern s32 sBackgroundCount;
+extern BackgroundContext sBackgroundCtx;
+extern u16 sSkyboxFlags;
+extern s32 sCloudCount;
+extern s16 sBackgroundSpriteR;
+extern s16 sBackgroundSpriteG;
+extern s16 sBackgroundSpriteB;
+extern CourseVenueFloor* sCourseVenueFloors[];
+extern CourseSkyboxes* sCourseSkyboxes[];
+extern Ghost gGhosts[3];
+extern GhostRacer gGhostRacers[3];
+extern Ghost* gFastestGhost;
+extern GhostRacer* gFastestGhostRacer;
+extern GfxPool* gGfxPool;
+extern Racer gRacers[TOTAL_RACER_COUNT];
+extern Racer* gRacersByPosition[TOTAL_RACER_COUNT];
+extern SegmentChunk gSegmentChunks[];
+extern Vtx* gCourseVtxPtr;
+extern Vtx* gEffectsVtxEndPtr;
+extern Vtx* gEffectsVtxPtr;
+extern s32 gCourseIndex;
+extern s32 gCurrentGhostType;
+extern s32 gTotalRacers;
+extern char* gCurrentTrackName;
+extern char* gTrackNames[55];
+extern s8 sGhostReplayRecordingBuffer[16200];
+extern s8* sGhostReplayRecordingPtr;
+extern s32 sGhostReplayRecordingSize;
+extern Racer* sFastestGhostRacerRacer;
+extern Racer* sLastRacer;
+extern Racer* sPlayerRacer;
+extern unk_800F8958 D_800F8958[2];
+extern unk_800F8958* D_800F89B8;
+extern unk_800F8958* D_800F89BC;
+extern s32 D_800F89C0;
+extern SegmentChunk* D_800F89C8;
+extern SegmentChunkGroup sSegmentChunkGroups[MOD_SEGMENT_CHUNK_GROUP_COUNT];
+extern SegmentChunk* sWorkingSegmentChunk;
+extern SegmentChunk* sWorkingNextSegmentChunk;
+extern Vec3s sVenuePipeFogColors[40];
+extern Vec3s sVenueTunnelFogColors[40];
+extern Vec3s* sPipeFogColors;
+extern Vec3s* sTunnelFogColors;
+extern Vtx* sTerrainEffectVtxStart;
+extern bool gInCourseEditor;
+extern s32 D_800DCCFC;
+extern unk_80225800 D_80225800;
+extern s32 gNumPlayers;
+extern s32 gGameMode;
+extern s32 gSkyboxType;
+extern s32 gVenueType;
+extern uintptr_t gSegments[16];
+extern uintptr_t gSegment16C8A0VramStart;
+extern uintptr_t gSegment17B1E0VramStart;
+extern uintptr_t gSegment1B8550VramStart;
+extern uintptr_t gSegment1E23F0VramStart;
+extern uintptr_t gSegment22B0A0VramStart;
+extern uintptr_t gSegment235130VramStart;
+extern uintptr_t gSegment2738A0VramStart;
+extern uintptr_t gUnkBssVramStart;
+extern u16 D_800CD2E0;
+extern s8 D_800CD2E4;
+extern s8 D_800CD2E8;
+extern s8 D_800CD2EC;
+extern s8 D_800CD2F0;
+extern s8 D_800CD2F4;
+extern Gfx D_80140F0[];
+extern Gfx D_8014138[];
+extern Gfx D_8014180[];
+extern Gfx D_80141C8[];
+extern Gfx D_8014210[];
+extern Gfx D_8014268[];
+extern Gfx D_80142C0[];
+extern Gfx D_8014308[];
+extern Gfx D_8014350[];
+extern Gfx D_8014398[];
+extern Gfx D_80143E0[];
+extern Gfx D_8014430[];
+extern Gfx D_8014480[];
+extern Gfx D_80144D0[];
+extern Gfx D_8014520[];
+extern Gfx D_8014580[];
+extern Gfx D_80145E0[];
+extern Gfx D_8014640[];
+
+#ifdef EXPANSION_KIT
+extern bool gInCourseEditTestRun;
+extern unk_80128C94* D_80128C90;
+extern unk_80128C94* D_80128C94;
+extern RomOffset gRomSegmentPairs[][2];
+#endif
+
+extern void Racer_UpdateRivalRacer(void);
+extern void Background_Init(void);
+extern void func_800A4BAC(void);
+extern void func_800747EC(s32 venue);
+extern void func_8007F4E0(s32 venue, s32 skybox);
+extern void func_8009CED0(s32 venue);
+extern uintptr_t Segment_SetAddress(s32 segment, uintptr_t addr);
+extern uintptr_t Segment_SetPhysicalAddress(s32 segment, uintptr_t addr);
+
+static u32 Mod_RoundUpToSector(u32 size) {
+    return (size + SECTOR_SIZE - 1) / SECTOR_SIZE;
+}
+
+static u32 Mod_HeaderByteCount(void)
+{
+    return MOD_METADATA_SIZE + MOD_GLOBAL_STATE_SIZE + MOD_POINTER_RELOC_SIZE + MOD_ARENA_STATE_SIZE + sizeof(cart_size);
+}
+
+static u32 Mod_ArenaStateOffset(void)
+{
+    return MOD_METADATA_SIZE + MOD_GLOBAL_STATE_SIZE + MOD_POINTER_RELOC_SIZE;
+}
+
+static void Mod_CacheArenaBounds(void)
+{
+    uintptr_t savedStarts[ARRAY_COUNT(sModArenaBasePtrs)];
+    uintptr_t savedEnds[ARRAY_COUNT(sModArenaLimitPtrs)];
+    s32 i;
+
+    for (i = 0; i < ARRAY_COUNT(savedStarts); i++) {
+        savedStarts[i] = gArenaStartPtrs[i];
+        savedEnds[i] = gArenaEndPtrs[i];
+    }
+
+    Arena_StartInit();
+    Arena_EndInit();
+
+    for (i = 0; i < ARRAY_COUNT(sModArenaBasePtrs); i++) {
+        sModArenaBasePtrs[i] = gArenaStartPtrs[i];
+        sModArenaLimitPtrs[i] = gArenaEndPtrs[i];
+        gArenaStartPtrs[i] = savedStarts[i];
+        gArenaEndPtrs[i] = savedEnds[i];
+    }
+}
+
+static bool Mod_ArenaFrontiersAreValid(const uintptr_t* starts, const uintptr_t* ends)
+{
+    s32 i;
+
+    for (i = 0; i < ARRAY_COUNT(sModArenaBasePtrs); i++) {
+        if ((starts[i] < sModArenaBasePtrs[i]) || (starts[i] > ends[i]) || (ends[i] > sModArenaLimitPtrs[i])) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+static u32 Mod_WriteArenaFrontiers(u8* out, u32 off)
+{
+    u32 value;
+    s32 i;
+
+    for (i = 0; i < ARRAY_COUNT(sModArenaBasePtrs); i++) {
+        value = (u32) gArenaStartPtrs[i];
+        off = mod_write_bytes(out, off, &value, sizeof(value));
+    }
+
+    for (i = 0; i < ARRAY_COUNT(sModArenaLimitPtrs); i++) {
+        value = (u32) gArenaEndPtrs[i];
+        off = mod_write_bytes(out, off, &value, sizeof(value));
+    }
+
+    return off;
+}
+
+static u32 Mod_ReadArenaFrontiers(const u8* in, u32 off, uintptr_t* starts, uintptr_t* ends)
+{
+    u32 value;
+    s32 i;
+
+    for (i = 0; i < ARRAY_COUNT(sModArenaBasePtrs); i++) {
+        memcpy(&value, in + off, sizeof(value));
+        starts[i] = value;
+        off += sizeof(value);
+    }
+
+    for (i = 0; i < ARRAY_COUNT(sModArenaLimitPtrs); i++) {
+        memcpy(&value, in + off, sizeof(value));
+        ends[i] = value;
+        off += sizeof(value);
+    }
+
+    return off;
+}
+
+static bool Mod_HeaderIsValid(const u8* in) {
+    u32 saved_header_size;
+    s8 i = 0;
+
+    for (; i < MOD_MAGIC_SIZE; i++)
+    {
+        if (sModMagic[i] != in[i])
+        {
+            return false;
+        }
+    }
+
+    if (in[MOD_MAGIC_SIZE] != MOD_FORMAT_VERSION)
+    {
+        return false;
+    }
+
+    memcpy(&saved_header_size, in + 8, sizeof(saved_header_size));
+    if (saved_header_size != Mod_HeaderByteCount())
+    {
+        return false;
+    }
+
+    if (saved_header_size > sizeof(gSaveStateMemory))
+    {
+        return false;
+    }
+
+    return true;
+}
+
+static void Mod_WriteHeaderMetadata(u8* out)
+{
+    u32 header_size = Mod_HeaderByteCount();
+
+    memcpy(out, sModMagic, MOD_MAGIC_SIZE);
+    out[MOD_MAGIC_SIZE] = MOD_FORMAT_VERSION;
+    memcpy(out + 8, &header_size, sizeof(header_size));
+}
+
+static u32 Mod_HeaderOffsetStart(void)
+{
+    return MOD_METADATA_SIZE;
+}
+
+static u32 Mod_HeaderSectorCount(void)
+{
+    return Mod_RoundUpToSector(Mod_HeaderByteCount());
+}
+
+static void Mod_SaveArenaRegions(u32* io_addr)
+{
+    u32 size;
+    s32 i;
+
+    for (i = 0; i < ARRAY_COUNT(sModArenaBasePtrs); i++) {
+        size = (u32) (gArenaStartPtrs[i] - sModArenaBasePtrs[i]);
+        if (size > 0) {
+            WriteRegionToSD((void*) sModArenaBasePtrs[i], size, io_addr);
+        }
+
+        size = (u32) (sModArenaLimitPtrs[i] - gArenaEndPtrs[i]);
+        if (size > 0) {
+            WriteRegionToSD((void*) gArenaEndPtrs[i], size, io_addr);
+        }
+    }
+}
+
+static void Mod_LoadArenaRegions(const uintptr_t* starts, const uintptr_t* ends, u32* io_addr)
+{
+    u32 size;
+    s32 i;
+
+    for (i = 0; i < ARRAY_COUNT(sModArenaBasePtrs); i++) {
+        size = (u32) (starts[i] - sModArenaBasePtrs[i]);
+        if (size > 0) {
+            ReadRegionFromSD((void*) sModArenaBasePtrs[i], size, io_addr);
+        }
+
+        size = (u32) (sModArenaLimitPtrs[i] - ends[i]);
+        if (size > 0) {
+            ReadRegionFromSD((void*) ends[i], size, io_addr);
+        }
+    }
+}
+
+static void Mod_RebuildTrackPointers(void) {
+    func_8007D9D0();
+    if ((gCourseIndex >= 0) && (gCourseIndex < ARRAY_COUNT(gTrackNames))) {
+        gCurrentTrackName = gTrackNames[gCourseIndex];
+    } else {
+        gCurrentTrackName = NULL;
+    }
+}
+
+static void Mod_RebuildRaceOrder(void) {
+    s32 i;
+
+    for (i = 0; i < ARRAY_COUNT(gRacersByPosition); i++) {
+        gRacersByPosition[i] = NULL;
+    }
+
+    for (i = 0; i < gTotalRacers; i++) {
+        if ((gRacers[i].position > 0) && (gRacers[i].position <= ARRAY_COUNT(gRacersByPosition))) {
+            gRacersByPosition[gRacers[i].position - 1] = &gRacers[i];
+        }
+    }
+}
+
+static void Mod_RebuildGhostPointers(void) {
+    s32 i;
+    s32 fastestGhostTime = 0x7FFFFFFF;
+    s32 fastestGhostRacerTime = 0x7FFFFFFF;
+
+    gFastestGhost = NULL;
+    gFastestGhostRacer = NULL;
+    sFastestGhostRacerRacer = NULL;
+
+    for (i = 0; i < ARRAY_COUNT(gGhostRacers); i++) {
+        if (gGhostRacers[i].replayIndex < 0) {
+            gGhostRacers[i].replayIndex = 0;
+        } else if (gGhostRacers[i].replayIndex > gGhosts[i].replaySize) {
+            gGhostRacers[i].replayIndex = gGhosts[i].replaySize;
+        }
+
+        gGhostRacers[i].ghost = &gGhosts[i];
+        gGhostRacers[i].replayPtr = &gGhosts[i].replayData[gGhostRacers[i].replayIndex];
+        gGhostRacers[i].racer = &gRacers[i + 1];
+
+        if ((gCurrentCourseInfo == NULL) || (gGhosts[i].encodedCourseIndex != gCurrentCourseInfo->encodedCourseIndex)) {
+            continue;
+        }
+
+        if ((gGhosts[i].ghostType == GHOST_PLAYER) && (gGhosts[i].raceTime < fastestGhostTime)) {
+            fastestGhostTime = gGhosts[i].raceTime;
+            gFastestGhost = &gGhosts[i];
+        }
+
+        if ((gCurrentGhostType != GHOST_NONE) && (gGhosts[i].ghostType == gCurrentGhostType) &&
+            (gGhosts[i].raceTime < fastestGhostRacerTime)) {
+            fastestGhostRacerTime = gGhosts[i].raceTime;
+            gFastestGhostRacer = &gGhostRacers[i];
+        }
+    }
+
+    if (gFastestGhostRacer != NULL) {
+        sFastestGhostRacerRacer = gFastestGhostRacer->racer;
+    }
+}
+
+static void Mod_InitCourseChunkScratch(void) {
+    D_800F8958[0].unk_04 = D_80140F0;
+    D_800F8958[0].unk_08 = D_8014180;
+    D_800F8958[0].unk_0C = D_80140F0;
+    D_800F8958[0].unk_10 = D_8014210;
+    D_800F8958[0].unk_14 = D_80142C0;
+    D_800F8958[0].unk_18 = D_8014308;
+    D_800F8958[0].unk_1C = D_80143E0;
+    D_800F8958[0].unk_20 = D_8014430;
+    D_800F8958[0].unk_24 = D_8014520;
+    D_800F8958[0].unk_28 = D_80145E0;
+    D_800F8958[0].loadVtxIndex = 0;
+    D_800F8958[1].unk_04 = D_8014138;
+    D_800F8958[1].unk_08 = D_80141C8;
+    D_800F8958[1].unk_0C = D_8014138;
+    D_800F8958[1].unk_10 = D_8014268;
+    D_800F8958[1].unk_14 = D_8014350;
+    D_800F8958[1].unk_18 = D_8014398;
+    D_800F8958[1].unk_1C = D_8014480;
+    D_800F8958[1].unk_20 = D_80144D0;
+    D_800F8958[1].unk_24 = D_8014580;
+    D_800F8958[1].unk_28 = D_8014640;
+    D_800F8958[1].loadVtxIndex = 8;
+}
+
+static void Mod_ResetCourseScratchState(void) {
+    s32 i;
+
+    func_800A4BAC();
+
+    D_800F8958[0].chunk = NULL;
+    D_800F8958[1].chunk = NULL;
+    D_800F89B8 = NULL;
+    D_800F89BC = NULL;
+    D_800F89C0 = 0;
+    D_800F89C8 = NULL;
+    sWorkingSegmentChunk = NULL;
+    sWorkingNextSegmentChunk = NULL;
+    for (i = 0; i < ARRAY_COUNT(sSegmentChunkGroups); i++) {
+        sSegmentChunkGroups[i].startChunk = NULL;
+        sSegmentChunkGroups[i].endChunk = NULL;
+        sSegmentChunkGroups[i].averageDepth = 0.0f;
+        sSegmentChunkGroups[i].drawState = 0;
+    }
+}
+
+static void Mod_ResetBackgroundState(void) {
+    Background* background;
+    Camera* camera;
+    CourseVenueFloor* venueFloor;
+    CourseSkyboxes* skybox;
+    s32 i;
+
+    if ((gVenueType < 0) || (gVenueType > VENUE_ENDING) || (gSkyboxType < 0) || (gSkyboxType > SKYBOX_SKY_BLUE)) {
+        return;
+    }
+
+    venueFloor = sCourseVenueFloors[gVenueType];
+    skybox = sCourseSkyboxes[gSkyboxType];
+
+    sBackgroundCount = gNumPlayers;
+    if (sBackgroundCount < 0) {
+        sBackgroundCount = 0;
+    } else if (sBackgroundCount > ARRAY_COUNT(sBackgrounds)) {
+        sBackgroundCount = ARRAY_COUNT(sBackgrounds);
+    }
+
+    sBackgroundCtx.venueFloor = venueFloor;
+    sBackgroundCtx.skybox = skybox;
+    sSkyboxFlags = skybox->flags;
+
+    if (gCurrentCourseInfo != NULL) {
+        gCurrentCourseInfo->courseFogColors[0] = skybox->courseFogR;
+        gCurrentCourseInfo->courseFogColors[1] = skybox->courseFogG;
+        gCurrentCourseInfo->courseFogColors[2] = skybox->courseFogB;
+
+        if ((skybox->racerFogR == 0) && (skybox->racerFogG == 0) && (skybox->racerFogB == 0)) {
+            gCurrentCourseInfo->racerFogColors[0] = skybox->courseFogR;
+            gCurrentCourseInfo->racerFogColors[1] = skybox->courseFogG;
+            gCurrentCourseInfo->racerFogColors[2] = skybox->courseFogB;
+        } else {
+            gCurrentCourseInfo->racerFogColors[0] = skybox->racerFogR;
+            gCurrentCourseInfo->racerFogColors[1] = skybox->racerFogG;
+            gCurrentCourseInfo->racerFogColors[2] = skybox->racerFogB;
+        }
+    }
+
+    sBackgroundSpriteR = skybox->backgroundSpriteR;
+    sBackgroundSpriteG = skybox->backgroundSpriteG;
+    sBackgroundSpriteB = skybox->backgroundSpriteB;
+
+    if (sSkyboxFlags & SKYBOX_CLOUDY) {
+        if (gNumPlayers >= 3) {
+            sCloudCount = 0;
+            sSkyboxFlags &= ~SKYBOX_CLOUDY;
+        } else {
+            sCloudCount = 1;
+        }
+    } else {
+        sCloudCount = 0;
+    }
+
+    for (i = 0, background = sBackgrounds, camera = gCameras; i < sBackgroundCount; i++, background++, camera++) {
+        background->pos.y = -750.0f;
+        if (gNumPlayers == 2) {
+            background->scrollDepth = 4300.0f;
+            background->skyboxDepth = 5300.0f;
+        } else {
+            background->scrollDepth = 6000.0f;
+            background->skyboxDepth = 7000.0f;
+        }
+        background->floorScroll.relativeEyeHeight = -750.0f;
+        background->floorScroll.relativeBackgroundHeight = -750.0f;
+        background->floorScroll.xScale = venueFloor->xScale;
+        background->floorScroll.zScale = venueFloor->zScale;
+        background->floorScroll.xScrollSpeed = venueFloor->xScrollSpeed;
+        background->floorScroll.zScrollSpeed = venueFloor->zScrollSpeed;
+        background->aspectRatio = camera->fovScaleY / camera->fovScaleX;
+    }
+}
+
+static void Mod_RebindSegmentTable(void) {
+    Segment_SetAddress(0, 0);
+    Segment_SetPhysicalAddress(1, gGfxPool);
+    Segment_SetAddress(2, gUnkBssVramStart);
+    Segment_SetAddress(3, gSegment17B1E0VramStart);
+    Segment_SetAddress(4, gSegment1B8550VramStart);
+    Segment_SetAddress(5, gSegment2738A0VramStart);
+    Segment_SetAddress(7, gSegment1E23F0VramStart);
+    Segment_SetAddress(8, gSegment16C8A0VramStart);
+    Segment_SetAddress(9, gSegment22B0A0VramStart);
+    Segment_SetAddress(10, gSegment235130VramStart);
+
+#ifdef EXPANSION_KIT
+    Segment_SetPhysicalAddress(6, &D_80128C90[D_800DCCFC]);
+#endif
+}
+
+static void Mod_ReloadCourseTrackGfx(void) {
+    uintptr_t src;
+
+    CLEAR_DATA_CACHE(osPhysicalToVirtual(gSegment16C8A0VramStart), SEGMENT_DATA_SIZE_CONST(course_track_gfx));
+#ifndef EXPANSION_KIT
+    Dma_LoadAssets(SEGMENT_ROM_START(course_track_gfx),
+                   (u8*) ((uintptr_t) osPhysicalToVirtual(gSegment16C8A0VramStart) +
+                          (size_t) SEGMENT_DATA_SIZE_CONST(course_track_gfx)),
+                   SEGMENT_ROM_SIZE(course_track_gfx));
+#else
+    Dma_LoadAssets(gRomSegmentPairs[15][0],
+                   (u8*) ((uintptr_t) osPhysicalToVirtual(gSegment16C8A0VramStart) +
+                          (size_t) SEGMENT_DATA_SIZE_CONST(course_track_gfx)),
+                   SEGMENT_VRAM_SIZE(course_track_gfx));
+#endif
+
+    src = (uintptr_t) osPhysicalToVirtual(gSegment16C8A0VramStart) + (size_t) SEGMENT_DATA_SIZE_CONST(course_track_gfx);
+    mio0Decode((u8*) src, osPhysicalToVirtual(gSegment16C8A0VramStart));
+}
+
+static void Mod_RearmGraphicsAssetLoads(void) {
+    D_800CD2E0 = 0;
+    D_800CD2E4 = false;
+    D_800CD2E8 = false;
+    D_800CD2EC = false;
+    D_800CD2F0 = -1;
+    D_800CD2F4 = false;
+
+    switch (gGameMode) {
+        case GAMEMODE_GP_RACE:
+        case GAMEMODE_PRACTICE:
+        case GAMEMODE_VS_2P:
+        case GAMEMODE_VS_3P:
+        case GAMEMODE_VS_4P:
+        case GAMEMODE_RECORDS:
+        case GAMEMODE_TIME_ATTACK:
+        case GAMEMODE_DEATH_RACE:
+            D_800CD2E0 = 1;
+            D_800CD2E4 = true;
+            D_800CD2EC = true;
+            break;
+        case GAMEMODE_GP_END_CS:
+            D_800CD2E0 = 1;
+            D_800CD2E4 = true;
+            D_800CD2EC = true;
+            D_800CD2F4 = true;
+            break;
+#ifdef EXPANSION_KIT
+        case GAMEMODE_COURSE_EDIT:
+            D_800CD2E0 = 1;
+            D_800CD2E4 = true;
+            D_800CD2E8 = true;
+            D_800CD2EC = true;
+            break;
+        case GAMEMODE_CREATE_MACHINE:
+            D_800CD2E0 = 1;
+            D_800CD2E4 = true;
+            D_800CD2E8 = true;
+            break;
+#endif
+        default:
+            break;
+    }
+}
+
+static void Mod_PostLoadFixups(void) {
+    Mod_RebuildTrackPointers();
+    Mod_RebindSegmentTable();
+    Mod_ReloadCourseTrackGfx();
+
+    if (gInCourseEditor) {
+        gCurrentCourseInfo = &gCourseInfos[0];
+    } else if ((gCourseIndex >= 0) && (gCourseIndex < ARRAY_COUNT(gCourseInfos))) {
+        gCurrentCourseInfo = &gCourseInfos[gCourseIndex];
+    } else {
+        gCurrentCourseInfo = NULL;
+    }
+
+    D_800E12C0 = &gCourseEffectsInfo;
+
+    gCourseVtxPtr = gGfxPool->courseVtxBuffer;
+    gEffectsVtxPtr = gGfxPool->effectsVtxBuffer;
+    gEffectsVtxEndPtr = &gGfxPool->effectsVtxBuffer[0x7FF];
+
+    if ((gTotalRacers > 0) && (gTotalRacers <= TOTAL_RACER_COUNT)) {
+        sLastRacer = &gRacers[gTotalRacers - 1];
+    } else {
+        sLastRacer = NULL;
+    }
+
+    if (gSegmentChunkCount > 0) {
+        sLastSegmentChunk = &gSegmentChunks[gSegmentChunkCount];
+    } else {
+        sLastSegmentChunk = NULL;
+    }
+
+    sPlayerRacer = gRacers;
+    Mod_RebuildRaceOrder();
+    Racer_UpdateRivalRacer();
+
+    if (sGhostReplayRecordingSize < 0) {
+        sGhostReplayRecordingSize = 0;
+    } else if (sGhostReplayRecordingSize > ARRAY_COUNT(sGhostReplayRecordingBuffer)) {
+        sGhostReplayRecordingSize = ARRAY_COUNT(sGhostReplayRecordingBuffer);
+    }
+    sGhostReplayRecordingPtr = &sGhostReplayRecordingBuffer[sGhostReplayRecordingSize];
+    Mod_RebuildGhostPointers();
+    Mod_ResetCourseScratchState();
+
+    if (gCurrentCourseInfo != NULL) {
+        func_8007F4E0(COURSE_CONTEXT()->courseData.venue, COURSE_CONTEXT()->courseData.skybox);
+        func_8009CED0(COURSE_CONTEXT()->courseData.venue);
+        func_800747EC(COURSE_CONTEXT()->courseData.venue);
+    }
+    Mod_RearmGraphicsAssetLoads();
+
+    if (gCurrentCourseInfo != NULL) {
+        sPipeFogColors = &sVenuePipeFogColors[COURSE_CONTEXT()->courseData.venue * PIPE_MAX];
+        sTunnelFogColors = &sVenueTunnelFogColors[COURSE_CONTEXT()->courseData.venue * TUNNEL_MAX];
+    } else {
+        sPipeFogColors = NULL;
+        sTunnelFogColors = NULL;
+    }
+
+    if (gCurrentCourseInfo != NULL) {
+        Background_Init();
+    } else {
+        Mod_ResetBackgroundState();
+    }
+
+#ifdef EXPANSION_KIT
+    if (gInCourseEditor) {
+        D_80128C94 = &D_80128C90[D_800DCCFC];
+        if (!gInCourseEditTestRun) {
+            sTerrainEffectVtxStart = D_80128C94->terrainEffectVtx;
+        } else {
+            sTerrainEffectVtxStart = D_80225800.terrainEffectVtx;
+        }
+    } else {
+        sTerrainEffectVtxStart = D_80225800.terrainEffectVtx;
+    }
+#else
+    sTerrainEffectVtxStart = D_80225800.terrainEffectVtx;
+#endif
+}
 
 static void WriteRegionToSD(const void* src_, u32 size, u32* io_lba)
 {
@@ -97,7 +747,7 @@ static void WriteRegionToSD(const void* src_, u32 size, u32* io_lba)
 
    while (remaining > 0)
     {
-        u32 space = KNOWN_SIZE - buffered;
+        u32 space = sizeof(gSaveStateMemory) - buffered;
         u32 n = (remaining < space) ? remaining : space;
 
         /* copy into staging buffer */
@@ -203,91 +853,107 @@ void Mod_Entry(void)
 void Mod_Save(void)
 {
     u32 addr;
-    u32 size;
+    u32 clear;
     u32 offset;
     u32 sectors;
-    u32 lastSectorWrite;
-    gSaveStateMemory[4] = 'B';
-    gSaveStateMemory[3] = 'D';
-    gSaveStateMemory[0] = 'D';
-    gSaveStateMemory[1] = 'E';
-    gSaveStateMemory[2] = 'A';
-    gSaveStateMemory[5] = 'E';
-    gSaveStateMemory[6] = 'E';
-    gSaveStateMemory[7] = k++;
-    
-    offset = global_write(gSaveStateMemory, 8);
+
+    Mod_CacheArenaBounds();
+    if (!Mod_ArenaFrontiersAreValid(gArenaStartPtrs, gArenaEndPtrs)) {
+        return;
+    }
+
+    clear = 0;
+    for (; clear < sizeof(gSaveStateMemory); clear++)
+    {
+      gSaveStateMemory[clear] = 0;
+    }
+    Mod_WriteHeaderMetadata(gSaveStateMemory);
+
+    offset = global_write(gSaveStateMemory, Mod_HeaderOffsetStart());
     offset = save_pointer_relocs(gSaveStateMemory, offset);
-    *(u32*)&gSaveStateMemory[offset] = cart_size;
-    offset += 4;
-    sectors = (offset + SECTOR_SIZE - 1) / SECTOR_SIZE;
+    offset = Mod_WriteArenaFrontiers(gSaveStateMemory, offset);
+    offset = mod_write_bytes(gSaveStateMemory, offset, &cart_size, sizeof(cart_size));
+    sectors = Mod_HeaderSectorCount();
     addr = (cart_size / SECTOR_SIZE) - LBA_OFFSET;
     osWritebackDCache(gSaveStateMemory, sectors * SECTOR_SIZE);
     cart_card_wr_dram(gSaveStateMemory, addr, sectors);
     addr += sectors;
-    size = (u32)(gArenaEndPtrs[0] - gArenaStartPtrs[0]);
-    if (size > 0)
-        WriteRegionToSD((void*)gArenaStartPtrs[0], size, &addr);
-
-    size = (u32)(gArenaEndPtrs[1] - gArenaStartPtrs[1]);
-    if (size > 0)
-        WriteRegionToSD((void*)gArenaStartPtrs[1], size, &addr);
-
-    size = (u32)(gArenaEndPtrs[2] - gArenaStartPtrs[2]);
-    if (size > 0)
-        WriteRegionToSD((void*)gArenaStartPtrs[2], size, &addr);
+    Mod_SaveArenaRegions(&addr);
 }
 
-void Mod_Load(void)
+bool Mod_Load(void)
 {
-  u32 addr;
-  u32 size;
-  u32 off;
-  u32 sectors;
-  u32 lastSectorWrite;
-  addr = (cart_size / SECTOR_SIZE) - LBA_OFFSET;
-  sc_card_rd_dram(gSaveStateMemory, addr, 400);
-  osInvalDCache(gSaveStateMemory, 400 * SECTOR_SIZE);
+    u32 addr;
+    u32 saved_cart_size;
+    u32 off;
+    u32 sectors;
+    uintptr_t savedStarts[ARRAY_COUNT(sModArenaBasePtrs)];
+    uintptr_t savedEnds[ARRAY_COUNT(sModArenaLimitPtrs)];
+    s32 i;
 
-  // double check for dead beef
-  off = 8;
-  off = global_load(gSaveStateMemory, off);
-  off = load_pointer_relocs(gSaveStateMemory, off);
+    Mod_CacheArenaBounds();
 
-  // Load all the arenas
-  sectors = (off + SECTOR_SIZE - 1) / SECTOR_SIZE;
-  addr += sectors;
-  size = (u32)(gArenaEndPtrs[0] - gArenaStartPtrs[0]);
-  if (size > 0)
-      ReadRegionFromSD((void*)gArenaStartPtrs[0], size, &addr);
+    addr = (cart_size / SECTOR_SIZE) - LBA_OFFSET;
+    cart_card_rd_dram(gSaveStateMemory, addr, MOD_HEADER_BUFFER_SIZE / SECTOR_SIZE);
+    osInvalDCache(gSaveStateMemory, MOD_HEADER_BUFFER_SIZE);
 
-  size = (u32)(gArenaEndPtrs[1] - gArenaStartPtrs[1]);
-  if (size > 0)
-      ReadRegionFromSD((void*)gArenaStartPtrs[1], size, &addr);
+    if (!Mod_HeaderIsValid(gSaveStateMemory)) {
+        return false;
+    }
 
-  size = (u32)(gArenaEndPtrs[2] - gArenaStartPtrs[2]);
-  if (size > 0)
-      ReadRegionFromSD((void*)gArenaStartPtrs[2], size, &addr);
+    off = Mod_ArenaStateOffset();
+    off = Mod_ReadArenaFrontiers(gSaveStateMemory, off, savedStarts, savedEnds);
+    off = mod_read_bytes(gSaveStateMemory, off, &saved_cart_size, sizeof(saved_cart_size));
+
+    if (saved_cart_size != cart_size) {
+        return false;
+    }
+
+    if (!Mod_ArenaFrontiersAreValid(savedStarts, savedEnds)) {
+        return false;
+    }
+
+    sectors = Mod_HeaderSectorCount();
+    addr += sectors;
+    Mod_LoadArenaRegions(savedStarts, savedEnds, &addr);
+
+    for (i = 0; i < ARRAY_COUNT(savedStarts); i++) {
+        gArenaStartPtrs[i] = savedStarts[i];
+        gArenaEndPtrs[i] = savedEnds[i];
+    }
+
+    /* Arena streaming reuses gSaveStateMemory as a sector buffer, so reload the header before applying globals. */
+    addr = (cart_size / SECTOR_SIZE) - LBA_OFFSET;
+    cart_card_rd_dram(gSaveStateMemory, addr, MOD_HEADER_BUFFER_SIZE / SECTOR_SIZE);
+    osInvalDCache(gSaveStateMemory, MOD_HEADER_BUFFER_SIZE);
+
+    off = Mod_HeaderOffsetStart();
+    off = global_load(gSaveStateMemory, off);
+    off = load_pointer_relocs(gSaveStateMemory, off);
+    off = Mod_ReadArenaFrontiers(gSaveStateMemory, off, savedStarts, savedEnds);
+    off = mod_read_bytes(gSaveStateMemory, off, &saved_cart_size, sizeof(saved_cart_size));
+
+    Mod_PostLoadFixups();
+
+    return true;
 }
 
 extern Controller gSharedController;
 bool Mod_Main(void)
 {
-  u16 buttons;
-  u16 down;
+    u16 buttons;
+    u16 down;
 
-  /* Current buttons */
-  buttons = gSharedController.buttonCurrent;
-  down = gSharedController.buttonPressed;
-  if ((buttons & BTN_CDOWN) && (buttons & BTN_L) && (buttons & BTN_R))
-  {
-    Mod_Save();
-  }
+    buttons = gSharedController.buttonCurrent;
+    down = gSharedController.buttonPressed;
+    if ((buttons & BTN_L) && (buttons & BTN_R) && (down & BTN_CDOWN)) {
+        Mod_Save();
+    }
 
-  if ((buttons & BTN_CUP) && (buttons & BTN_R) && (buttons & BTN_L))
-  {
-    Mod_Load();
-    return true;
-  }
-  return false;
+    if ((buttons & BTN_L) && (buttons & BTN_R) && (down & BTN_CUP)) {
+        if (Mod_Load()) {
+            return true;
+        }
+    }
+    return false;
 }

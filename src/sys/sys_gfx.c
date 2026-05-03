@@ -86,7 +86,7 @@ uintptr_t gUnkContextVramStart;
 uintptr_t gUnkContextVramEnd;
 uintptr_t gAudioContextVramStart;
 uintptr_t gAudioContextVramEnd;
-extern bool Mod_Main();
+extern bool Mod_Main(void);
 
 void func_80067AE0(void) {
     s32 temp_t7;
@@ -193,10 +193,7 @@ void func_80067D64(void) {
     while (osDpGetStatus() &
            (DPC_STATUS_DMA_BUSY | DPC_STATUS_CMD_BUSY | DPC_STATUS_PIPE_BUSY | DPC_STATUS_TMEM_BUSY)) {}
 
-    if (Mod_Main())
-    {
-      return; // quit the frame
-    }
+    Mod_Main();
     Segment_LoadAssets();
     Transition_SetBackgroundBuffer();
     osViSwapBuffer(gFrameBuffers[D_800DCD00]);
@@ -227,10 +224,7 @@ void func_80067E98(void) {
            retries != 0) {
         retries--;
     }
-    if (Mod_Main())
-    {
-      return; // quit the frame
-    }
+    Mod_Main();
 
     Gfx_SetTask(sGfxTask);
 }

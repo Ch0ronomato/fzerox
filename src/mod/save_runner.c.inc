@@ -1,3 +1,7 @@
+#define MOD_GLOBAL_STATE_SIZE 393144
+#define MOD_POINTER_RELOC_SIZE 60
+#define MOD_HEADER_SIZE 393244
+#define MOD_HEADER_BUFFER_SIZE 393728
 #include "src/mod/audio__rom__external.c.inc"
 #include "src/mod/audio__rom__lib__load.c.inc"
 #include "src/mod/audio__rom__lib__seqplayer.c.inc"
@@ -7,8 +11,10 @@
 #include "src/mod/game__camera.c.inc"
 #include "src/mod/game__common.c.inc"
 #include "src/mod/game__course.c.inc"
+#include "src/mod/game__course_gadget_context.c.inc"
 #include "src/mod/game__course_gadgets.c.inc"
 #include "src/mod/game__game.c.inc"
+#include "src/mod/game__game_context.c.inc"
 #include "src/mod/game__object.c.inc"
 #include "src/mod/game__racer.c.inc"
 #include "src/mod/overlays__ovl_i2__effects.c.inc"
@@ -33,8 +39,10 @@ u32 global_write(u8* out, u32 off)
 	off = game__camera__save(out, off);
 	off = game__common__save(out, off);
 	off = game__course__save(out, off);
+	off = game__course_gadget_context__save(out, off);
 	off = game__course_gadgets__save(out, off);
 	off = game__game__save(out, off);
+	off = game__game_context__save(out, off);
 	off = game__object__save(out, off);
 	off = game__racer__save(out, off);
 	off = overlays__ovl_i2__effects__save(out, off);
@@ -62,8 +70,10 @@ u32 global_load(u8* out, u32 off)
 	off = game__camera__load(out, off);
 	off = game__common__load(out, off);
 	off = game__course__load(out, off);
+	off = game__course_gadget_context__load(out, off);
 	off = game__course_gadgets__load(out, off);
 	off = game__game__load(out, off);
+	off = game__game_context__load(out, off);
 	off = game__object__load(out, off);
 	off = game__racer__load(out, off);
 	off = overlays__ovl_i2__effects__load(out, off);

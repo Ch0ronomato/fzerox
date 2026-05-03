@@ -105,7 +105,6 @@ static u32 overlays__ovl_i3__cpu__save(u8* out, u32 off)
 	off = mod_write_bytes(out, off, &sMrsArrowRacerId, 4);
 	off = mod_write_bytes(out, off, &sOctomanRacerId, 4);
 	off = mod_write_bytes(out, off, &sPicoRacerId, 4);
-	off = mod_write_bytes(out, off, &sPlayerRacer, 8);
 	off = mod_write_bytes(out, off, &sRogerBusterRacerId, 4);
 	off = mod_write_bytes(out, off, &sSamuraiGorohRacerId, 4);
 	off = mod_write_bytes(out, off, &sSilverNeelsenRacerId, 4);
@@ -166,7 +165,6 @@ static u32 overlays__ovl_i3__cpu__load(u8* out, u32 off)
 	off = mod_read_bytes(out, off, &sMrsArrowRacerId, 4);
 	off = mod_read_bytes(out, off, &sOctomanRacerId, 4);
 	off = mod_read_bytes(out, off, &sPicoRacerId, 4);
-	off = mod_read_bytes(out, off, &sPlayerRacer, 8);
 	off = mod_read_bytes(out, off, &sRogerBusterRacerId, 4);
 	off = mod_read_bytes(out, off, &sSamuraiGorohRacerId, 4);
 	off = mod_read_bytes(out, off, &sSilverNeelsenRacerId, 4);

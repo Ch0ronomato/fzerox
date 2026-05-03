@@ -71,7 +71,6 @@ extern struct CourseVenueFloor sVenueFloorWhiteLand;
 static u32 overlays__ovl_i3__background__save(u8* out, u32 off)
 {
 	off = mod_write_bytes(out, off, D_i3_8006C538, 80);
-	
 	off = mod_write_bytes(out, off, &sBackgroundCount, 4);
 	off = mod_write_bytes(out, off, &sBackgroundCtx, 16);
 	off = mod_write_bytes(out, off, sBackgroundFlashingColors, 9);
@@ -111,7 +110,6 @@ static u32 overlays__ovl_i3__background__save(u8* out, u32 off)
 	off = mod_write_bytes(out, off, sBackgroundSprites, 240);
 	off = mod_write_bytes(out, off, sBackgrounds, 384);
 	off = mod_write_bytes(out, off, &sCloudCount, 4);
-	off = mod_write_bytes(out, off, &sCloudTexture, 8);
 	off = mod_write_bytes(out, off, sDaytimeBackgroundSprites, 68);
 	off = mod_write_bytes(out, off, &sIsEndingCutscene, 2);
 	off = mod_write_bytes(out, off, sNighttimeBackgroundSprites, 28);
@@ -123,11 +121,9 @@ static u32 overlays__ovl_i3__background__save(u8* out, u32 off)
 	off = mod_write_bytes(out, off, &sSkyboxPurple, 24);
 	off = mod_write_bytes(out, off, &sSkyboxSkyBlue, 24);
 	off = mod_write_bytes(out, off, &sSkyboxSunset, 24);
-	off = mod_write_bytes(out, off, &sSkyboxTexture, 8);
 	off = mod_write_bytes(out, off, &sSkyboxTurquoise, 24);
 	off = mod_write_bytes(out, off, &sSpritePaletteReplacementCount, 2);
 	off = mod_write_bytes(out, off, &sStarCount, 4);
-	off = mod_write_bytes(out, off, &sStarTexture, 8);
 	off = mod_write_bytes(out, off, sStars, 5200);
 	off = mod_write_bytes(out, off, &sVenueFloorBigBlue, 24);
 	off = mod_write_bytes(out, off, &sVenueFloorDevilsForest, 24);
@@ -138,7 +134,6 @@ static u32 overlays__ovl_i3__background__save(u8* out, u32 off)
 	off = mod_write_bytes(out, off, &sVenueFloorSandOcean, 24);
 	off = mod_write_bytes(out, off, &sVenueFloorSector, 24);
 	off = mod_write_bytes(out, off, &sVenueFloorSilence, 24);
-	off = mod_write_bytes(out, off, &sVenueFloorTexture, 8);
 	off = mod_write_bytes(out, off, &sVenueFloorWhiteLand, 24);
 	return off;
 }
@@ -146,7 +141,6 @@ static u32 overlays__ovl_i3__background__save(u8* out, u32 off)
 static u32 overlays__ovl_i3__background__load(u8* out, u32 off)
 {
 	off = mod_read_bytes(out, off, D_i3_8006C538, 80);
-	
 	off = mod_read_bytes(out, off, &sBackgroundCount, 4);
 	off = mod_read_bytes(out, off, &sBackgroundCtx, 16);
 	off = mod_read_bytes(out, off, sBackgroundFlashingColors, 9);
@@ -186,7 +180,6 @@ static u32 overlays__ovl_i3__background__load(u8* out, u32 off)
 	off = mod_read_bytes(out, off, sBackgroundSprites, 240);
 	off = mod_read_bytes(out, off, sBackgrounds, 384);
 	off = mod_read_bytes(out, off, &sCloudCount, 4);
-	off = mod_read_bytes(out, off, &sCloudTexture, 8);
 	off = mod_read_bytes(out, off, sDaytimeBackgroundSprites, 68);
 	off = mod_read_bytes(out, off, &sIsEndingCutscene, 2);
 	off = mod_read_bytes(out, off, sNighttimeBackgroundSprites, 28);
@@ -198,11 +191,9 @@ static u32 overlays__ovl_i3__background__load(u8* out, u32 off)
 	off = mod_read_bytes(out, off, &sSkyboxPurple, 24);
 	off = mod_read_bytes(out, off, &sSkyboxSkyBlue, 24);
 	off = mod_read_bytes(out, off, &sSkyboxSunset, 24);
-	off = mod_read_bytes(out, off, &sSkyboxTexture, 8);
 	off = mod_read_bytes(out, off, &sSkyboxTurquoise, 24);
 	off = mod_read_bytes(out, off, &sSpritePaletteReplacementCount, 2);
 	off = mod_read_bytes(out, off, &sStarCount, 4);
-	off = mod_read_bytes(out, off, &sStarTexture, 8);
 	off = mod_read_bytes(out, off, sStars, 5200);
 	off = mod_read_bytes(out, off, &sVenueFloorBigBlue, 24);
 	off = mod_read_bytes(out, off, &sVenueFloorDevilsForest, 24);
@@ -213,7 +204,6 @@ static u32 overlays__ovl_i3__background__load(u8* out, u32 off)
 	off = mod_read_bytes(out, off, &sVenueFloorSandOcean, 24);
 	off = mod_read_bytes(out, off, &sVenueFloorSector, 24);
 	off = mod_read_bytes(out, off, &sVenueFloorSilence, 24);
-	off = mod_read_bytes(out, off, &sVenueFloorTexture, 8);
 	off = mod_read_bytes(out, off, &sVenueFloorWhiteLand, 24);
 	return off;
 }

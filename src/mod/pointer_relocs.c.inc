@@ -1,418 +1,26 @@
 static u32 save_pointer_relocs(u8* out, u32 off)
 {
-    /* D_800E12C0 */
+    /* sCloudTexture */
     {
         s16 arena_index = -1;
         u32 offset_val = 0;
 
-        if (D_800E12C0 != NULL)
+        if (sCloudTexture != NULL)
         {
-            if ((uintptr_t)D_800E12C0 >= gArenaStartPtrs[0] && (uintptr_t)D_800E12C0 < gArenaEndPtrs[0])
+            if ((uintptr_t)sCloudTexture >= gArenaStartPtrs[0] && (uintptr_t)sCloudTexture < gArenaEndPtrs[0])
             {
                 arena_index = 0;
-                offset_val = (u32)((uintptr_t)D_800E12C0 - gArenaStartPtrs[0]);
+                offset_val = (u32)((uintptr_t)sCloudTexture - gArenaStartPtrs[0]);
             }
-            else if ((uintptr_t)D_800E12C0 >= gArenaStartPtrs[1] && (uintptr_t)D_800E12C0 < gArenaEndPtrs[1])
+            else if ((uintptr_t)sCloudTexture >= gArenaStartPtrs[1] && (uintptr_t)sCloudTexture < gArenaEndPtrs[1])
             {
                 arena_index = 1;
-                offset_val = (u32)((uintptr_t)D_800E12C0 - gArenaStartPtrs[1]);
+                offset_val = (u32)((uintptr_t)sCloudTexture - gArenaStartPtrs[1]);
             }
-            else if ((uintptr_t)D_800E12C0 >= gArenaStartPtrs[2] && (uintptr_t)D_800E12C0 < gArenaEndPtrs[2])
+            else if ((uintptr_t)sCloudTexture >= gArenaStartPtrs[2] && (uintptr_t)sCloudTexture < gArenaEndPtrs[2])
             {
                 arena_index = 2;
-                offset_val = (u32)((uintptr_t)D_800E12C0 - gArenaStartPtrs[2]);
-            }
-        }
-
-        off = mod_write_bytes(out, off, &arena_index, sizeof(arena_index));
-        off = mod_write_bytes(out, off, &offset_val, sizeof(offset_val));
-    }
-
-    /* D_800F89B8 */
-    {
-        s16 arena_index = -1;
-        u32 offset_val = 0;
-
-        if (D_800F89B8 != NULL)
-        {
-            if ((uintptr_t)D_800F89B8 >= gArenaStartPtrs[0] && (uintptr_t)D_800F89B8 < gArenaEndPtrs[0])
-            {
-                arena_index = 0;
-                offset_val = (u32)((uintptr_t)D_800F89B8 - gArenaStartPtrs[0]);
-            }
-            else if ((uintptr_t)D_800F89B8 >= gArenaStartPtrs[1] && (uintptr_t)D_800F89B8 < gArenaEndPtrs[1])
-            {
-                arena_index = 1;
-                offset_val = (u32)((uintptr_t)D_800F89B8 - gArenaStartPtrs[1]);
-            }
-            else if ((uintptr_t)D_800F89B8 >= gArenaStartPtrs[2] && (uintptr_t)D_800F89B8 < gArenaEndPtrs[2])
-            {
-                arena_index = 2;
-                offset_val = (u32)((uintptr_t)D_800F89B8 - gArenaStartPtrs[2]);
-            }
-        }
-
-        off = mod_write_bytes(out, off, &arena_index, sizeof(arena_index));
-        off = mod_write_bytes(out, off, &offset_val, sizeof(offset_val));
-    }
-
-    /* D_800F89BC */
-    {
-        s16 arena_index = -1;
-        u32 offset_val = 0;
-
-        if (D_800F89BC != NULL)
-        {
-            if ((uintptr_t)D_800F89BC >= gArenaStartPtrs[0] && (uintptr_t)D_800F89BC < gArenaEndPtrs[0])
-            {
-                arena_index = 0;
-                offset_val = (u32)((uintptr_t)D_800F89BC - gArenaStartPtrs[0]);
-            }
-            else if ((uintptr_t)D_800F89BC >= gArenaStartPtrs[1] && (uintptr_t)D_800F89BC < gArenaEndPtrs[1])
-            {
-                arena_index = 1;
-                offset_val = (u32)((uintptr_t)D_800F89BC - gArenaStartPtrs[1]);
-            }
-            else if ((uintptr_t)D_800F89BC >= gArenaStartPtrs[2] && (uintptr_t)D_800F89BC < gArenaEndPtrs[2])
-            {
-                arena_index = 2;
-                offset_val = (u32)((uintptr_t)D_800F89BC - gArenaStartPtrs[2]);
-            }
-        }
-
-        off = mod_write_bytes(out, off, &arena_index, sizeof(arena_index));
-        off = mod_write_bytes(out, off, &offset_val, sizeof(offset_val));
-    }
-
-    /* D_800F89C8 */
-    {
-        s16 arena_index = -1;
-        u32 offset_val = 0;
-
-        if (D_800F89C8 != NULL)
-        {
-            if ((uintptr_t)D_800F89C8 >= gArenaStartPtrs[0] && (uintptr_t)D_800F89C8 < gArenaEndPtrs[0])
-            {
-                arena_index = 0;
-                offset_val = (u32)((uintptr_t)D_800F89C8 - gArenaStartPtrs[0]);
-            }
-            else if ((uintptr_t)D_800F89C8 >= gArenaStartPtrs[1] && (uintptr_t)D_800F89C8 < gArenaEndPtrs[1])
-            {
-                arena_index = 1;
-                offset_val = (u32)((uintptr_t)D_800F89C8 - gArenaStartPtrs[1]);
-            }
-            else if ((uintptr_t)D_800F89C8 >= gArenaStartPtrs[2] && (uintptr_t)D_800F89C8 < gArenaEndPtrs[2])
-            {
-                arena_index = 2;
-                offset_val = (u32)((uintptr_t)D_800F89C8 - gArenaStartPtrs[2]);
-            }
-        }
-
-        off = mod_write_bytes(out, off, &arena_index, sizeof(arena_index));
-        off = mod_write_bytes(out, off, &offset_val, sizeof(offset_val));
-    }
-
-    /* gCourseVtxPtr */
-    {
-        s16 arena_index = -1;
-        u32 offset_val = 0;
-
-        if (gCourseVtxPtr != NULL)
-        {
-            if ((uintptr_t)gCourseVtxPtr >= gArenaStartPtrs[0] && (uintptr_t)gCourseVtxPtr < gArenaEndPtrs[0])
-            {
-                arena_index = 0;
-                offset_val = (u32)((uintptr_t)gCourseVtxPtr - gArenaStartPtrs[0]);
-            }
-            else if ((uintptr_t)gCourseVtxPtr >= gArenaStartPtrs[1] && (uintptr_t)gCourseVtxPtr < gArenaEndPtrs[1])
-            {
-                arena_index = 1;
-                offset_val = (u32)((uintptr_t)gCourseVtxPtr - gArenaStartPtrs[1]);
-            }
-            else if ((uintptr_t)gCourseVtxPtr >= gArenaStartPtrs[2] && (uintptr_t)gCourseVtxPtr < gArenaEndPtrs[2])
-            {
-                arena_index = 2;
-                offset_val = (u32)((uintptr_t)gCourseVtxPtr - gArenaStartPtrs[2]);
-            }
-        }
-
-        off = mod_write_bytes(out, off, &arena_index, sizeof(arena_index));
-        off = mod_write_bytes(out, off, &offset_val, sizeof(offset_val));
-    }
-
-    /* gCurrentCourseInfo */
-    {
-        s16 arena_index = -1;
-        u32 offset_val = 0;
-
-        if (gCurrentCourseInfo != NULL)
-        {
-            if ((uintptr_t)gCurrentCourseInfo >= gArenaStartPtrs[0] && (uintptr_t)gCurrentCourseInfo < gArenaEndPtrs[0])
-            {
-                arena_index = 0;
-                offset_val = (u32)((uintptr_t)gCurrentCourseInfo - gArenaStartPtrs[0]);
-            }
-            else if ((uintptr_t)gCurrentCourseInfo >= gArenaStartPtrs[1] && (uintptr_t)gCurrentCourseInfo < gArenaEndPtrs[1])
-            {
-                arena_index = 1;
-                offset_val = (u32)((uintptr_t)gCurrentCourseInfo - gArenaStartPtrs[1]);
-            }
-            else if ((uintptr_t)gCurrentCourseInfo >= gArenaStartPtrs[2] && (uintptr_t)gCurrentCourseInfo < gArenaEndPtrs[2])
-            {
-                arena_index = 2;
-                offset_val = (u32)((uintptr_t)gCurrentCourseInfo - gArenaStartPtrs[2]);
-            }
-        }
-
-        off = mod_write_bytes(out, off, &arena_index, sizeof(arena_index));
-        off = mod_write_bytes(out, off, &offset_val, sizeof(offset_val));
-    }
-
-    /* gCurrentTrackName */
-    {
-        s16 arena_index = -1;
-        u32 offset_val = 0;
-
-        if (gCurrentTrackName != NULL)
-        {
-            if ((uintptr_t)gCurrentTrackName >= gArenaStartPtrs[0] && (uintptr_t)gCurrentTrackName < gArenaEndPtrs[0])
-            {
-                arena_index = 0;
-                offset_val = (u32)((uintptr_t)gCurrentTrackName - gArenaStartPtrs[0]);
-            }
-            else if ((uintptr_t)gCurrentTrackName >= gArenaStartPtrs[1] && (uintptr_t)gCurrentTrackName < gArenaEndPtrs[1])
-            {
-                arena_index = 1;
-                offset_val = (u32)((uintptr_t)gCurrentTrackName - gArenaStartPtrs[1]);
-            }
-            else if ((uintptr_t)gCurrentTrackName >= gArenaStartPtrs[2] && (uintptr_t)gCurrentTrackName < gArenaEndPtrs[2])
-            {
-                arena_index = 2;
-                offset_val = (u32)((uintptr_t)gCurrentTrackName - gArenaStartPtrs[2]);
-            }
-        }
-
-        off = mod_write_bytes(out, off, &arena_index, sizeof(arena_index));
-        off = mod_write_bytes(out, off, &offset_val, sizeof(offset_val));
-    }
-
-    /* gEffectsVtxEndPtr */
-    {
-        s16 arena_index = -1;
-        u32 offset_val = 0;
-
-        if (gEffectsVtxEndPtr != NULL)
-        {
-            if ((uintptr_t)gEffectsVtxEndPtr >= gArenaStartPtrs[0] && (uintptr_t)gEffectsVtxEndPtr < gArenaEndPtrs[0])
-            {
-                arena_index = 0;
-                offset_val = (u32)((uintptr_t)gEffectsVtxEndPtr - gArenaStartPtrs[0]);
-            }
-            else if ((uintptr_t)gEffectsVtxEndPtr >= gArenaStartPtrs[1] && (uintptr_t)gEffectsVtxEndPtr < gArenaEndPtrs[1])
-            {
-                arena_index = 1;
-                offset_val = (u32)((uintptr_t)gEffectsVtxEndPtr - gArenaStartPtrs[1]);
-            }
-            else if ((uintptr_t)gEffectsVtxEndPtr >= gArenaStartPtrs[2] && (uintptr_t)gEffectsVtxEndPtr < gArenaEndPtrs[2])
-            {
-                arena_index = 2;
-                offset_val = (u32)((uintptr_t)gEffectsVtxEndPtr - gArenaStartPtrs[2]);
-            }
-        }
-
-        off = mod_write_bytes(out, off, &arena_index, sizeof(arena_index));
-        off = mod_write_bytes(out, off, &offset_val, sizeof(offset_val));
-    }
-
-    /* gEffectsVtxPtr */
-    {
-        s16 arena_index = -1;
-        u32 offset_val = 0;
-
-        if (gEffectsVtxPtr != NULL)
-        {
-            if ((uintptr_t)gEffectsVtxPtr >= gArenaStartPtrs[0] && (uintptr_t)gEffectsVtxPtr < gArenaEndPtrs[0])
-            {
-                arena_index = 0;
-                offset_val = (u32)((uintptr_t)gEffectsVtxPtr - gArenaStartPtrs[0]);
-            }
-            else if ((uintptr_t)gEffectsVtxPtr >= gArenaStartPtrs[1] && (uintptr_t)gEffectsVtxPtr < gArenaEndPtrs[1])
-            {
-                arena_index = 1;
-                offset_val = (u32)((uintptr_t)gEffectsVtxPtr - gArenaStartPtrs[1]);
-            }
-            else if ((uintptr_t)gEffectsVtxPtr >= gArenaStartPtrs[2] && (uintptr_t)gEffectsVtxPtr < gArenaEndPtrs[2])
-            {
-                arena_index = 2;
-                offset_val = (u32)((uintptr_t)gEffectsVtxPtr - gArenaStartPtrs[2]);
-            }
-        }
-
-        off = mod_write_bytes(out, off, &arena_index, sizeof(arena_index));
-        off = mod_write_bytes(out, off, &offset_val, sizeof(offset_val));
-    }
-
-    /* gFastestGhost */
-    {
-        s16 arena_index = -1;
-        u32 offset_val = 0;
-
-        if (gFastestGhost != NULL)
-        {
-            if ((uintptr_t)gFastestGhost >= gArenaStartPtrs[0] && (uintptr_t)gFastestGhost < gArenaEndPtrs[0])
-            {
-                arena_index = 0;
-                offset_val = (u32)((uintptr_t)gFastestGhost - gArenaStartPtrs[0]);
-            }
-            else if ((uintptr_t)gFastestGhost >= gArenaStartPtrs[1] && (uintptr_t)gFastestGhost < gArenaEndPtrs[1])
-            {
-                arena_index = 1;
-                offset_val = (u32)((uintptr_t)gFastestGhost - gArenaStartPtrs[1]);
-            }
-            else if ((uintptr_t)gFastestGhost >= gArenaStartPtrs[2] && (uintptr_t)gFastestGhost < gArenaEndPtrs[2])
-            {
-                arena_index = 2;
-                offset_val = (u32)((uintptr_t)gFastestGhost - gArenaStartPtrs[2]);
-            }
-        }
-
-        off = mod_write_bytes(out, off, &arena_index, sizeof(arena_index));
-        off = mod_write_bytes(out, off, &offset_val, sizeof(offset_val));
-    }
-
-    /* gFastestGhostRacer */
-    {
-        s16 arena_index = -1;
-        u32 offset_val = 0;
-
-        if (gFastestGhostRacer != NULL)
-        {
-            if ((uintptr_t)gFastestGhostRacer >= gArenaStartPtrs[0] && (uintptr_t)gFastestGhostRacer < gArenaEndPtrs[0])
-            {
-                arena_index = 0;
-                offset_val = (u32)((uintptr_t)gFastestGhostRacer - gArenaStartPtrs[0]);
-            }
-            else if ((uintptr_t)gFastestGhostRacer >= gArenaStartPtrs[1] && (uintptr_t)gFastestGhostRacer < gArenaEndPtrs[1])
-            {
-                arena_index = 1;
-                offset_val = (u32)((uintptr_t)gFastestGhostRacer - gArenaStartPtrs[1]);
-            }
-            else if ((uintptr_t)gFastestGhostRacer >= gArenaStartPtrs[2] && (uintptr_t)gFastestGhostRacer < gArenaEndPtrs[2])
-            {
-                arena_index = 2;
-                offset_val = (u32)((uintptr_t)gFastestGhostRacer - gArenaStartPtrs[2]);
-            }
-        }
-
-        off = mod_write_bytes(out, off, &arena_index, sizeof(arena_index));
-        off = mod_write_bytes(out, off, &offset_val, sizeof(offset_val));
-    }
-
-    /* sFastestGhostRacerRacer */
-    {
-        s16 arena_index = -1;
-        u32 offset_val = 0;
-
-        if (sFastestGhostRacerRacer != NULL)
-        {
-            if ((uintptr_t)sFastestGhostRacerRacer >= gArenaStartPtrs[0] && (uintptr_t)sFastestGhostRacerRacer < gArenaEndPtrs[0])
-            {
-                arena_index = 0;
-                offset_val = (u32)((uintptr_t)sFastestGhostRacerRacer - gArenaStartPtrs[0]);
-            }
-            else if ((uintptr_t)sFastestGhostRacerRacer >= gArenaStartPtrs[1] && (uintptr_t)sFastestGhostRacerRacer < gArenaEndPtrs[1])
-            {
-                arena_index = 1;
-                offset_val = (u32)((uintptr_t)sFastestGhostRacerRacer - gArenaStartPtrs[1]);
-            }
-            else if ((uintptr_t)sFastestGhostRacerRacer >= gArenaStartPtrs[2] && (uintptr_t)sFastestGhostRacerRacer < gArenaEndPtrs[2])
-            {
-                arena_index = 2;
-                offset_val = (u32)((uintptr_t)sFastestGhostRacerRacer - gArenaStartPtrs[2]);
-            }
-        }
-
-        off = mod_write_bytes(out, off, &arena_index, sizeof(arena_index));
-        off = mod_write_bytes(out, off, &offset_val, sizeof(offset_val));
-    }
-
-    /* sGhostReplayRecordingPtr */
-    {
-        s16 arena_index = -1;
-        u32 offset_val = 0;
-
-        if (sGhostReplayRecordingPtr != NULL)
-        {
-            if ((uintptr_t)sGhostReplayRecordingPtr >= gArenaStartPtrs[0] && (uintptr_t)sGhostReplayRecordingPtr < gArenaEndPtrs[0])
-            {
-                arena_index = 0;
-                offset_val = (u32)((uintptr_t)sGhostReplayRecordingPtr - gArenaStartPtrs[0]);
-            }
-            else if ((uintptr_t)sGhostReplayRecordingPtr >= gArenaStartPtrs[1] && (uintptr_t)sGhostReplayRecordingPtr < gArenaEndPtrs[1])
-            {
-                arena_index = 1;
-                offset_val = (u32)((uintptr_t)sGhostReplayRecordingPtr - gArenaStartPtrs[1]);
-            }
-            else if ((uintptr_t)sGhostReplayRecordingPtr >= gArenaStartPtrs[2] && (uintptr_t)sGhostReplayRecordingPtr < gArenaEndPtrs[2])
-            {
-                arena_index = 2;
-                offset_val = (u32)((uintptr_t)sGhostReplayRecordingPtr - gArenaStartPtrs[2]);
-            }
-        }
-
-        off = mod_write_bytes(out, off, &arena_index, sizeof(arena_index));
-        off = mod_write_bytes(out, off, &offset_val, sizeof(offset_val));
-    }
-
-    /* sLastRacer */
-    {
-        s16 arena_index = -1;
-        u32 offset_val = 0;
-
-        if (sLastRacer != NULL)
-        {
-            if ((uintptr_t)sLastRacer >= gArenaStartPtrs[0] && (uintptr_t)sLastRacer < gArenaEndPtrs[0])
-            {
-                arena_index = 0;
-                offset_val = (u32)((uintptr_t)sLastRacer - gArenaStartPtrs[0]);
-            }
-            else if ((uintptr_t)sLastRacer >= gArenaStartPtrs[1] && (uintptr_t)sLastRacer < gArenaEndPtrs[1])
-            {
-                arena_index = 1;
-                offset_val = (u32)((uintptr_t)sLastRacer - gArenaStartPtrs[1]);
-            }
-            else if ((uintptr_t)sLastRacer >= gArenaStartPtrs[2] && (uintptr_t)sLastRacer < gArenaEndPtrs[2])
-            {
-                arena_index = 2;
-                offset_val = (u32)((uintptr_t)sLastRacer - gArenaStartPtrs[2]);
-            }
-        }
-
-        off = mod_write_bytes(out, off, &arena_index, sizeof(arena_index));
-        off = mod_write_bytes(out, off, &offset_val, sizeof(offset_val));
-    }
-
-    /* sLastSegmentChunk */
-    {
-        s16 arena_index = -1;
-        u32 offset_val = 0;
-
-        if (sLastSegmentChunk != NULL)
-        {
-            if ((uintptr_t)sLastSegmentChunk >= gArenaStartPtrs[0] && (uintptr_t)sLastSegmentChunk < gArenaEndPtrs[0])
-            {
-                arena_index = 0;
-                offset_val = (u32)((uintptr_t)sLastSegmentChunk - gArenaStartPtrs[0]);
-            }
-            else if ((uintptr_t)sLastSegmentChunk >= gArenaStartPtrs[1] && (uintptr_t)sLastSegmentChunk < gArenaEndPtrs[1])
-            {
-                arena_index = 1;
-                offset_val = (u32)((uintptr_t)sLastSegmentChunk - gArenaStartPtrs[1]);
-            }
-            else if ((uintptr_t)sLastSegmentChunk >= gArenaStartPtrs[2] && (uintptr_t)sLastSegmentChunk < gArenaEndPtrs[2])
-            {
-                arena_index = 2;
-                offset_val = (u32)((uintptr_t)sLastSegmentChunk - gArenaStartPtrs[2]);
+                offset_val = (u32)((uintptr_t)sCloudTexture - gArenaStartPtrs[2]);
             }
         }
 
@@ -476,62 +84,6 @@ static u32 save_pointer_relocs(u8* out, u32 off)
         off = mod_write_bytes(out, off, &offset_val, sizeof(offset_val));
     }
 
-    /* sPipeFogColors */
-    {
-        s16 arena_index = -1;
-        u32 offset_val = 0;
-
-        if (sPipeFogColors != NULL)
-        {
-            if ((uintptr_t)sPipeFogColors >= gArenaStartPtrs[0] && (uintptr_t)sPipeFogColors < gArenaEndPtrs[0])
-            {
-                arena_index = 0;
-                offset_val = (u32)((uintptr_t)sPipeFogColors - gArenaStartPtrs[0]);
-            }
-            else if ((uintptr_t)sPipeFogColors >= gArenaStartPtrs[1] && (uintptr_t)sPipeFogColors < gArenaEndPtrs[1])
-            {
-                arena_index = 1;
-                offset_val = (u32)((uintptr_t)sPipeFogColors - gArenaStartPtrs[1]);
-            }
-            else if ((uintptr_t)sPipeFogColors >= gArenaStartPtrs[2] && (uintptr_t)sPipeFogColors < gArenaEndPtrs[2])
-            {
-                arena_index = 2;
-                offset_val = (u32)((uintptr_t)sPipeFogColors - gArenaStartPtrs[2]);
-            }
-        }
-
-        off = mod_write_bytes(out, off, &arena_index, sizeof(arena_index));
-        off = mod_write_bytes(out, off, &offset_val, sizeof(offset_val));
-    }
-
-    /* sPlayerRacer */
-    {
-        s16 arena_index = -1;
-        u32 offset_val = 0;
-
-        if (sPlayerRacer != NULL)
-        {
-            if ((uintptr_t)sPlayerRacer >= gArenaStartPtrs[0] && (uintptr_t)sPlayerRacer < gArenaEndPtrs[0])
-            {
-                arena_index = 0;
-                offset_val = (u32)((uintptr_t)sPlayerRacer - gArenaStartPtrs[0]);
-            }
-            else if ((uintptr_t)sPlayerRacer >= gArenaStartPtrs[1] && (uintptr_t)sPlayerRacer < gArenaEndPtrs[1])
-            {
-                arena_index = 1;
-                offset_val = (u32)((uintptr_t)sPlayerRacer - gArenaStartPtrs[1]);
-            }
-            else if ((uintptr_t)sPlayerRacer >= gArenaStartPtrs[2] && (uintptr_t)sPlayerRacer < gArenaEndPtrs[2])
-            {
-                arena_index = 2;
-                offset_val = (u32)((uintptr_t)sPlayerRacer - gArenaStartPtrs[2]);
-            }
-        }
-
-        off = mod_write_bytes(out, off, &arena_index, sizeof(arena_index));
-        off = mod_write_bytes(out, off, &offset_val, sizeof(offset_val));
-    }
-
     /* sRetirePalette */
     {
         s16 arena_index = -1;
@@ -588,27 +140,27 @@ static u32 save_pointer_relocs(u8* out, u32 off)
         off = mod_write_bytes(out, off, &offset_val, sizeof(offset_val));
     }
 
-    /* sRivalRacer */
+    /* sSkyboxTexture */
     {
         s16 arena_index = -1;
         u32 offset_val = 0;
 
-        if (sRivalRacer != NULL)
+        if (sSkyboxTexture != NULL)
         {
-            if ((uintptr_t)sRivalRacer >= gArenaStartPtrs[0] && (uintptr_t)sRivalRacer < gArenaEndPtrs[0])
+            if ((uintptr_t)sSkyboxTexture >= gArenaStartPtrs[0] && (uintptr_t)sSkyboxTexture < gArenaEndPtrs[0])
             {
                 arena_index = 0;
-                offset_val = (u32)((uintptr_t)sRivalRacer - gArenaStartPtrs[0]);
+                offset_val = (u32)((uintptr_t)sSkyboxTexture - gArenaStartPtrs[0]);
             }
-            else if ((uintptr_t)sRivalRacer >= gArenaStartPtrs[1] && (uintptr_t)sRivalRacer < gArenaEndPtrs[1])
+            else if ((uintptr_t)sSkyboxTexture >= gArenaStartPtrs[1] && (uintptr_t)sSkyboxTexture < gArenaEndPtrs[1])
             {
                 arena_index = 1;
-                offset_val = (u32)((uintptr_t)sRivalRacer - gArenaStartPtrs[1]);
+                offset_val = (u32)((uintptr_t)sSkyboxTexture - gArenaStartPtrs[1]);
             }
-            else if ((uintptr_t)sRivalRacer >= gArenaStartPtrs[2] && (uintptr_t)sRivalRacer < gArenaEndPtrs[2])
+            else if ((uintptr_t)sSkyboxTexture >= gArenaStartPtrs[2] && (uintptr_t)sSkyboxTexture < gArenaEndPtrs[2])
             {
                 arena_index = 2;
-                offset_val = (u32)((uintptr_t)sRivalRacer - gArenaStartPtrs[2]);
+                offset_val = (u32)((uintptr_t)sSkyboxTexture - gArenaStartPtrs[2]);
             }
         }
 
@@ -616,27 +168,27 @@ static u32 save_pointer_relocs(u8* out, u32 off)
         off = mod_write_bytes(out, off, &offset_val, sizeof(offset_val));
     }
 
-    /* sTerrainEffectVtxStart */
+    /* sStarTexture */
     {
         s16 arena_index = -1;
         u32 offset_val = 0;
 
-        if (sTerrainEffectVtxStart != NULL)
+        if (sStarTexture != NULL)
         {
-            if ((uintptr_t)sTerrainEffectVtxStart >= gArenaStartPtrs[0] && (uintptr_t)sTerrainEffectVtxStart < gArenaEndPtrs[0])
+            if ((uintptr_t)sStarTexture >= gArenaStartPtrs[0] && (uintptr_t)sStarTexture < gArenaEndPtrs[0])
             {
                 arena_index = 0;
-                offset_val = (u32)((uintptr_t)sTerrainEffectVtxStart - gArenaStartPtrs[0]);
+                offset_val = (u32)((uintptr_t)sStarTexture - gArenaStartPtrs[0]);
             }
-            else if ((uintptr_t)sTerrainEffectVtxStart >= gArenaStartPtrs[1] && (uintptr_t)sTerrainEffectVtxStart < gArenaEndPtrs[1])
+            else if ((uintptr_t)sStarTexture >= gArenaStartPtrs[1] && (uintptr_t)sStarTexture < gArenaEndPtrs[1])
             {
                 arena_index = 1;
-                offset_val = (u32)((uintptr_t)sTerrainEffectVtxStart - gArenaStartPtrs[1]);
+                offset_val = (u32)((uintptr_t)sStarTexture - gArenaStartPtrs[1]);
             }
-            else if ((uintptr_t)sTerrainEffectVtxStart >= gArenaStartPtrs[2] && (uintptr_t)sTerrainEffectVtxStart < gArenaEndPtrs[2])
+            else if ((uintptr_t)sStarTexture >= gArenaStartPtrs[2] && (uintptr_t)sStarTexture < gArenaEndPtrs[2])
             {
                 arena_index = 2;
-                offset_val = (u32)((uintptr_t)sTerrainEffectVtxStart - gArenaStartPtrs[2]);
+                offset_val = (u32)((uintptr_t)sStarTexture - gArenaStartPtrs[2]);
             }
         }
 
@@ -644,27 +196,27 @@ static u32 save_pointer_relocs(u8* out, u32 off)
         off = mod_write_bytes(out, off, &offset_val, sizeof(offset_val));
     }
 
-    /* sTunnelFogColors */
+    /* sVenueFloorTexture */
     {
         s16 arena_index = -1;
         u32 offset_val = 0;
 
-        if (sTunnelFogColors != NULL)
+        if (sVenueFloorTexture != NULL)
         {
-            if ((uintptr_t)sTunnelFogColors >= gArenaStartPtrs[0] && (uintptr_t)sTunnelFogColors < gArenaEndPtrs[0])
+            if ((uintptr_t)sVenueFloorTexture >= gArenaStartPtrs[0] && (uintptr_t)sVenueFloorTexture < gArenaEndPtrs[0])
             {
                 arena_index = 0;
-                offset_val = (u32)((uintptr_t)sTunnelFogColors - gArenaStartPtrs[0]);
+                offset_val = (u32)((uintptr_t)sVenueFloorTexture - gArenaStartPtrs[0]);
             }
-            else if ((uintptr_t)sTunnelFogColors >= gArenaStartPtrs[1] && (uintptr_t)sTunnelFogColors < gArenaEndPtrs[1])
+            else if ((uintptr_t)sVenueFloorTexture >= gArenaStartPtrs[1] && (uintptr_t)sVenueFloorTexture < gArenaEndPtrs[1])
             {
                 arena_index = 1;
-                offset_val = (u32)((uintptr_t)sTunnelFogColors - gArenaStartPtrs[1]);
+                offset_val = (u32)((uintptr_t)sVenueFloorTexture - gArenaStartPtrs[1]);
             }
-            else if ((uintptr_t)sTunnelFogColors >= gArenaStartPtrs[2] && (uintptr_t)sTunnelFogColors < gArenaEndPtrs[2])
+            else if ((uintptr_t)sVenueFloorTexture >= gArenaStartPtrs[2] && (uintptr_t)sVenueFloorTexture < gArenaEndPtrs[2])
             {
                 arena_index = 2;
-                offset_val = (u32)((uintptr_t)sTunnelFogColors - gArenaStartPtrs[2]);
+                offset_val = (u32)((uintptr_t)sVenueFloorTexture - gArenaStartPtrs[2]);
             }
         }
 
@@ -728,68 +280,12 @@ static u32 save_pointer_relocs(u8* out, u32 off)
         off = mod_write_bytes(out, off, &offset_val, sizeof(offset_val));
     }
 
-    /* sWorkingNextSegmentChunk */
-    {
-        s16 arena_index = -1;
-        u32 offset_val = 0;
-
-        if (sWorkingNextSegmentChunk != NULL)
-        {
-            if ((uintptr_t)sWorkingNextSegmentChunk >= gArenaStartPtrs[0] && (uintptr_t)sWorkingNextSegmentChunk < gArenaEndPtrs[0])
-            {
-                arena_index = 0;
-                offset_val = (u32)((uintptr_t)sWorkingNextSegmentChunk - gArenaStartPtrs[0]);
-            }
-            else if ((uintptr_t)sWorkingNextSegmentChunk >= gArenaStartPtrs[1] && (uintptr_t)sWorkingNextSegmentChunk < gArenaEndPtrs[1])
-            {
-                arena_index = 1;
-                offset_val = (u32)((uintptr_t)sWorkingNextSegmentChunk - gArenaStartPtrs[1]);
-            }
-            else if ((uintptr_t)sWorkingNextSegmentChunk >= gArenaStartPtrs[2] && (uintptr_t)sWorkingNextSegmentChunk < gArenaEndPtrs[2])
-            {
-                arena_index = 2;
-                offset_val = (u32)((uintptr_t)sWorkingNextSegmentChunk - gArenaStartPtrs[2]);
-            }
-        }
-
-        off = mod_write_bytes(out, off, &arena_index, sizeof(arena_index));
-        off = mod_write_bytes(out, off, &offset_val, sizeof(offset_val));
-    }
-
-    /* sWorkingSegmentChunk */
-    {
-        s16 arena_index = -1;
-        u32 offset_val = 0;
-
-        if (sWorkingSegmentChunk != NULL)
-        {
-            if ((uintptr_t)sWorkingSegmentChunk >= gArenaStartPtrs[0] && (uintptr_t)sWorkingSegmentChunk < gArenaEndPtrs[0])
-            {
-                arena_index = 0;
-                offset_val = (u32)((uintptr_t)sWorkingSegmentChunk - gArenaStartPtrs[0]);
-            }
-            else if ((uintptr_t)sWorkingSegmentChunk >= gArenaStartPtrs[1] && (uintptr_t)sWorkingSegmentChunk < gArenaEndPtrs[1])
-            {
-                arena_index = 1;
-                offset_val = (u32)((uintptr_t)sWorkingSegmentChunk - gArenaStartPtrs[1]);
-            }
-            else if ((uintptr_t)sWorkingSegmentChunk >= gArenaStartPtrs[2] && (uintptr_t)sWorkingSegmentChunk < gArenaEndPtrs[2])
-            {
-                arena_index = 2;
-                offset_val = (u32)((uintptr_t)sWorkingSegmentChunk - gArenaStartPtrs[2]);
-            }
-        }
-
-        off = mod_write_bytes(out, off, &arena_index, sizeof(arena_index));
-        off = mod_write_bytes(out, off, &offset_val, sizeof(offset_val));
-    }
-
 	return off;
 }
 
 static u32 load_pointer_relocs(u8* in, u32 off)
 {
-    /* D_800E12C0 */
+    /* sCloudTexture */
     {
         s16 arena_index;
         u32 offset_val;
@@ -799,263 +295,11 @@ static u32 load_pointer_relocs(u8* in, u32 off)
 
         if (arena_index >= 0)
         {
-            D_800E12C0 = (void*)(gArenaStartPtrs[arena_index] + offset_val);
+            sCloudTexture = (void*)(gArenaStartPtrs[arena_index] + offset_val);
         }
         else
         {
-            D_800E12C0 = NULL;
-        }
-    }
-
-    /* D_800F89B8 */
-    {
-        s16 arena_index;
-        u32 offset_val;
-
-        off = mod_read_bytes(in, off, &arena_index, sizeof(arena_index));
-        off = mod_read_bytes(in, off, &offset_val, sizeof(offset_val));
-
-        if (arena_index >= 0)
-        {
-            D_800F89B8 = (void*)(gArenaStartPtrs[arena_index] + offset_val);
-        }
-        else
-        {
-            D_800F89B8 = NULL;
-        }
-    }
-
-    /* D_800F89BC */
-    {
-        s16 arena_index;
-        u32 offset_val;
-
-        off = mod_read_bytes(in, off, &arena_index, sizeof(arena_index));
-        off = mod_read_bytes(in, off, &offset_val, sizeof(offset_val));
-
-        if (arena_index >= 0)
-        {
-            D_800F89BC = (void*)(gArenaStartPtrs[arena_index] + offset_val);
-        }
-        else
-        {
-            D_800F89BC = NULL;
-        }
-    }
-
-    /* D_800F89C8 */
-    {
-        s16 arena_index;
-        u32 offset_val;
-
-        off = mod_read_bytes(in, off, &arena_index, sizeof(arena_index));
-        off = mod_read_bytes(in, off, &offset_val, sizeof(offset_val));
-
-        if (arena_index >= 0)
-        {
-            D_800F89C8 = (void*)(gArenaStartPtrs[arena_index] + offset_val);
-        }
-        else
-        {
-            D_800F89C8 = NULL;
-        }
-    }
-
-    /* gCourseVtxPtr */
-    {
-        s16 arena_index;
-        u32 offset_val;
-
-        off = mod_read_bytes(in, off, &arena_index, sizeof(arena_index));
-        off = mod_read_bytes(in, off, &offset_val, sizeof(offset_val));
-
-        if (arena_index >= 0)
-        {
-            gCourseVtxPtr = (void*)(gArenaStartPtrs[arena_index] + offset_val);
-        }
-        else
-        {
-            gCourseVtxPtr = NULL;
-        }
-    }
-
-    /* gCurrentCourseInfo */
-    {
-        s16 arena_index;
-        u32 offset_val;
-
-        off = mod_read_bytes(in, off, &arena_index, sizeof(arena_index));
-        off = mod_read_bytes(in, off, &offset_val, sizeof(offset_val));
-
-        if (arena_index >= 0)
-        {
-            gCurrentCourseInfo = (void*)(gArenaStartPtrs[arena_index] + offset_val);
-        }
-        else
-        {
-            gCurrentCourseInfo = NULL;
-        }
-    }
-
-    /* gCurrentTrackName */
-    {
-        s16 arena_index;
-        u32 offset_val;
-
-        off = mod_read_bytes(in, off, &arena_index, sizeof(arena_index));
-        off = mod_read_bytes(in, off, &offset_val, sizeof(offset_val));
-
-        if (arena_index >= 0)
-        {
-            gCurrentTrackName = (void*)(gArenaStartPtrs[arena_index] + offset_val);
-        }
-        else
-        {
-            gCurrentTrackName = NULL;
-        }
-    }
-
-    /* gEffectsVtxEndPtr */
-    {
-        s16 arena_index;
-        u32 offset_val;
-
-        off = mod_read_bytes(in, off, &arena_index, sizeof(arena_index));
-        off = mod_read_bytes(in, off, &offset_val, sizeof(offset_val));
-
-        if (arena_index >= 0)
-        {
-            gEffectsVtxEndPtr = (void*)(gArenaStartPtrs[arena_index] + offset_val);
-        }
-        else
-        {
-            gEffectsVtxEndPtr = NULL;
-        }
-    }
-
-    /* gEffectsVtxPtr */
-    {
-        s16 arena_index;
-        u32 offset_val;
-
-        off = mod_read_bytes(in, off, &arena_index, sizeof(arena_index));
-        off = mod_read_bytes(in, off, &offset_val, sizeof(offset_val));
-
-        if (arena_index >= 0)
-        {
-            gEffectsVtxPtr = (void*)(gArenaStartPtrs[arena_index] + offset_val);
-        }
-        else
-        {
-            gEffectsVtxPtr = NULL;
-        }
-    }
-
-    /* gFastestGhost */
-    {
-        s16 arena_index;
-        u32 offset_val;
-
-        off = mod_read_bytes(in, off, &arena_index, sizeof(arena_index));
-        off = mod_read_bytes(in, off, &offset_val, sizeof(offset_val));
-
-        if (arena_index >= 0)
-        {
-            gFastestGhost = (void*)(gArenaStartPtrs[arena_index] + offset_val);
-        }
-        else
-        {
-            gFastestGhost = NULL;
-        }
-    }
-
-    /* gFastestGhostRacer */
-    {
-        s16 arena_index;
-        u32 offset_val;
-
-        off = mod_read_bytes(in, off, &arena_index, sizeof(arena_index));
-        off = mod_read_bytes(in, off, &offset_val, sizeof(offset_val));
-
-        if (arena_index >= 0)
-        {
-            gFastestGhostRacer = (void*)(gArenaStartPtrs[arena_index] + offset_val);
-        }
-        else
-        {
-            gFastestGhostRacer = NULL;
-        }
-    }
-
-    /* sFastestGhostRacerRacer */
-    {
-        s16 arena_index;
-        u32 offset_val;
-
-        off = mod_read_bytes(in, off, &arena_index, sizeof(arena_index));
-        off = mod_read_bytes(in, off, &offset_val, sizeof(offset_val));
-
-        if (arena_index >= 0)
-        {
-            sFastestGhostRacerRacer = (void*)(gArenaStartPtrs[arena_index] + offset_val);
-        }
-        else
-        {
-            sFastestGhostRacerRacer = NULL;
-        }
-    }
-
-    /* sGhostReplayRecordingPtr */
-    {
-        s16 arena_index;
-        u32 offset_val;
-
-        off = mod_read_bytes(in, off, &arena_index, sizeof(arena_index));
-        off = mod_read_bytes(in, off, &offset_val, sizeof(offset_val));
-
-        if (arena_index >= 0)
-        {
-            sGhostReplayRecordingPtr = (void*)(gArenaStartPtrs[arena_index] + offset_val);
-        }
-        else
-        {
-            sGhostReplayRecordingPtr = NULL;
-        }
-    }
-
-    /* sLastRacer */
-    {
-        s16 arena_index;
-        u32 offset_val;
-
-        off = mod_read_bytes(in, off, &arena_index, sizeof(arena_index));
-        off = mod_read_bytes(in, off, &offset_val, sizeof(offset_val));
-
-        if (arena_index >= 0)
-        {
-            sLastRacer = (void*)(gArenaStartPtrs[arena_index] + offset_val);
-        }
-        else
-        {
-            sLastRacer = NULL;
-        }
-    }
-
-    /* sLastSegmentChunk */
-    {
-        s16 arena_index;
-        u32 offset_val;
-
-        off = mod_read_bytes(in, off, &arena_index, sizeof(arena_index));
-        off = mod_read_bytes(in, off, &offset_val, sizeof(offset_val));
-
-        if (arena_index >= 0)
-        {
-            sLastSegmentChunk = (void*)(gArenaStartPtrs[arena_index] + offset_val);
-        }
-        else
-        {
-            sLastSegmentChunk = NULL;
+            sCloudTexture = NULL;
         }
     }
 
@@ -1095,42 +339,6 @@ static u32 load_pointer_relocs(u8* in, u32 off)
         }
     }
 
-    /* sPipeFogColors */
-    {
-        s16 arena_index;
-        u32 offset_val;
-
-        off = mod_read_bytes(in, off, &arena_index, sizeof(arena_index));
-        off = mod_read_bytes(in, off, &offset_val, sizeof(offset_val));
-
-        if (arena_index >= 0)
-        {
-            sPipeFogColors = (void*)(gArenaStartPtrs[arena_index] + offset_val);
-        }
-        else
-        {
-            sPipeFogColors = NULL;
-        }
-    }
-
-    /* sPlayerRacer */
-    {
-        s16 arena_index;
-        u32 offset_val;
-
-        off = mod_read_bytes(in, off, &arena_index, sizeof(arena_index));
-        off = mod_read_bytes(in, off, &offset_val, sizeof(offset_val));
-
-        if (arena_index >= 0)
-        {
-            sPlayerRacer = (void*)(gArenaStartPtrs[arena_index] + offset_val);
-        }
-        else
-        {
-            sPlayerRacer = NULL;
-        }
-    }
-
     /* sRetirePalette */
     {
         s16 arena_index;
@@ -1167,7 +375,7 @@ static u32 load_pointer_relocs(u8* in, u32 off)
         }
     }
 
-    /* sRivalRacer */
+    /* sSkyboxTexture */
     {
         s16 arena_index;
         u32 offset_val;
@@ -1177,15 +385,15 @@ static u32 load_pointer_relocs(u8* in, u32 off)
 
         if (arena_index >= 0)
         {
-            sRivalRacer = (void*)(gArenaStartPtrs[arena_index] + offset_val);
+            sSkyboxTexture = (void*)(gArenaStartPtrs[arena_index] + offset_val);
         }
         else
         {
-            sRivalRacer = NULL;
+            sSkyboxTexture = NULL;
         }
     }
 
-    /* sTerrainEffectVtxStart */
+    /* sStarTexture */
     {
         s16 arena_index;
         u32 offset_val;
@@ -1195,15 +403,15 @@ static u32 load_pointer_relocs(u8* in, u32 off)
 
         if (arena_index >= 0)
         {
-            sTerrainEffectVtxStart = (void*)(gArenaStartPtrs[arena_index] + offset_val);
+            sStarTexture = (void*)(gArenaStartPtrs[arena_index] + offset_val);
         }
         else
         {
-            sTerrainEffectVtxStart = NULL;
+            sStarTexture = NULL;
         }
     }
 
-    /* sTunnelFogColors */
+    /* sVenueFloorTexture */
     {
         s16 arena_index;
         u32 offset_val;
@@ -1213,11 +421,11 @@ static u32 load_pointer_relocs(u8* in, u32 off)
 
         if (arena_index >= 0)
         {
-            sTunnelFogColors = (void*)(gArenaStartPtrs[arena_index] + offset_val);
+            sVenueFloorTexture = (void*)(gArenaStartPtrs[arena_index] + offset_val);
         }
         else
         {
-            sTunnelFogColors = NULL;
+            sVenueFloorTexture = NULL;
         }
     }
 
@@ -1254,42 +462,6 @@ static u32 load_pointer_relocs(u8* in, u32 off)
         else
         {
             sWinnerTexture = NULL;
-        }
-    }
-
-    /* sWorkingNextSegmentChunk */
-    {
-        s16 arena_index;
-        u32 offset_val;
-
-        off = mod_read_bytes(in, off, &arena_index, sizeof(arena_index));
-        off = mod_read_bytes(in, off, &offset_val, sizeof(offset_val));
-
-        if (arena_index >= 0)
-        {
-            sWorkingNextSegmentChunk = (void*)(gArenaStartPtrs[arena_index] + offset_val);
-        }
-        else
-        {
-            sWorkingNextSegmentChunk = NULL;
-        }
-    }
-
-    /* sWorkingSegmentChunk */
-    {
-        s16 arena_index;
-        u32 offset_val;
-
-        off = mod_read_bytes(in, off, &arena_index, sizeof(arena_index));
-        off = mod_read_bytes(in, off, &offset_val, sizeof(offset_val));
-
-        if (arena_index >= 0)
-        {
-            sWorkingSegmentChunk = (void*)(gArenaStartPtrs[arena_index] + offset_val);
-        }
-        else
-        {
-            sWorkingSegmentChunk = NULL;
         }
     }
 
