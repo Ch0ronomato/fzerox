@@ -4207,6 +4207,8 @@ void Course_DrawBackwardChunkGroup(SegmentChunkGroup* chunkGroup) {
     f32 var_fv0;
     s32 trackType;
     u32 trackShape;
+    s32 guard;
+    s32 innerGuard;
     unk_800CF528* temp_a1;
 
     sWorkingSegmentChunk = chunkGroup->startChunk;
@@ -4216,7 +4218,11 @@ void Course_DrawBackwardChunkGroup(SegmentChunkGroup* chunkGroup) {
         sWorkingNextSegmentChunk = gSegmentChunks;
     }
 
+    guard = gSegmentChunkCount + 1;
     do {
+        if (guard-- <= 0) {
+            return;
+        }
         if (sWorkingNextSegmentChunk->trackSegmentInfo & TRACK_FLAG_CONTINUOUS) {
             if (sWorkingNextSegmentChunk != chunkGroup->endChunk) {
 
@@ -4225,8 +4231,12 @@ void Course_DrawBackwardChunkGroup(SegmentChunkGroup* chunkGroup) {
                     D_800F89C8 = gSegmentChunks;
                 }
                 var_fv0 = D_800F894C;
+                innerGuard = gSegmentChunkCount + 1;
 
                 do {
+                    if (innerGuard-- <= 0) {
+                        return;
+                    }
                     var_fv0 += D_800F8950;
                     if (D_800F89C8->depth < var_fv0) {
                         break;
@@ -4292,6 +4302,8 @@ void Course_DrawForwardChunkGroup(SegmentChunkGroup* chunkGroup) {
     f32 var_fv0;
     s32 trackType;
     u32 trackShape;
+    s32 guard;
+    s32 innerGuard;
     unk_800CF528* temp_a2;
     SegmentChunk* firstChunk = gSegmentChunks;
 
@@ -4301,7 +4313,11 @@ void Course_DrawForwardChunkGroup(SegmentChunkGroup* chunkGroup) {
     }
     sWorkingNextSegmentChunk = chunkGroup->endChunk;
 
+    guard = gSegmentChunkCount + 1;
     do {
+        if (guard-- <= 0) {
+            return;
+        }
         if (sWorkingSegmentChunk->trackSegmentInfo & TRACK_FLAG_CONTINUOUS) {
             if (sWorkingSegmentChunk != chunkGroup->startChunk) {
                 D_800F89C8 = sWorkingSegmentChunk - 1;
@@ -4309,8 +4325,12 @@ void Course_DrawForwardChunkGroup(SegmentChunkGroup* chunkGroup) {
                     D_800F89C8 = sLastSegmentChunk - 1;
                 }
                 var_fv0 = D_800F894C;
+                innerGuard = gSegmentChunkCount + 1;
 
                 do {
+                    if (innerGuard-- <= 0) {
+                        return;
+                    }
                     var_fv0 += D_800F8950;
                     if (D_800F89C8->depth < var_fv0) {
                         break;
@@ -4483,6 +4503,8 @@ Gfx* Course_Draw(Gfx* gfx, s32 cameraIndex) {
     s32 var_a0;
     s32 var_t0;
     s32 var_a2;
+    s32 guard;
+    s32 innerGuard;
     Racer* racer;
     Camera* camera;
     s32 i;
@@ -4608,12 +4630,20 @@ Gfx* Course_Draw(Gfx* gfx, s32 cameraIndex) {
         chunk = sLastSegmentChunk - 1;
         if (chunk->drawState == 0) {
             chunk = gSegmentChunks;
+            guard = gSegmentChunkCount + 1;
             while (chunk->drawState == 0) {
+                if (guard-- <= 0) {
+                    return sCourseDisp;
+                }
                 chunk++;
             }
         } else {
             chunk--;
+            guard = gSegmentChunkCount + 1;
             while (chunk->drawState != 0) {
+                if (guard-- <= 0) {
+                    return sCourseDisp;
+                }
                 chunk--;
             }
             chunk++;
@@ -4627,8 +4657,12 @@ Gfx* Course_Draw(Gfx* gfx, s32 cameraIndex) {
             segmentChunkGroup->averageDepth = temp_fa0 = chunk->depth;
             segmentChunkGroup->drawState = lastChunkDrawState = chunk->drawState;
             var_a0 = 1;
+            innerGuard = gSegmentChunkCount + 1;
 
             while (true) {
+                if (innerGuard-- <= 0) {
+                    return sCourseDisp;
+                }
                 chunk++;
                 if (chunk == sLastSegmentChunk) {
                     chunk = gSegmentChunks;
@@ -4648,7 +4682,11 @@ Gfx* Course_Draw(Gfx* gfx, s32 cameraIndex) {
             if (++segmentChunkGroup == sSegmentChunkGroups + ARRAY_COUNT(sSegmentChunkGroups)) {
                 return sCourseDisp;
             }
+            guard = gSegmentChunkCount + 1;
             while (chunk->drawState == 0) {
+                if (guard-- <= 0) {
+                    return sCourseDisp;
+                }
                 chunk++;
                 if (chunk == sLastSegmentChunk) {
                     chunk = gSegmentChunks;

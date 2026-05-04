@@ -12,7 +12,11 @@ import os.path
 import multiprocessing.pool
 import re
 import sys
-loc = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/libclang.dylib"
+
+if sys.platform == "darwin":
+    loc = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/libclang.dylib"
+else:
+    loc = "/usr/lib/x86_64-linux-gnu/libclang-14.so.1"
 clang.cindex.Config.set_library_file(loc)
 
 
@@ -21,16 +25,22 @@ def read_bin(binfile):
     with open(binfile, "rb") as f:
         rdram = f.read()
     # gGamePaused is a u8
-    assert (len(rdram) ==
-            0x800000), f"Rom length is weird {len(rdram)} bytes"
+    assert len(rdram) == 0x800000, f"Rom length is weird {len(rdram)} bytes"
     return rdram
 
 
 def find(binfile, symbols, show_hex, do_base64):
     rdram = read_bin(binfile)
-    for symbol, data in sorted(symbols.items(), key=lambda x: int(x[1]['loc'], 16)):
-        index = int(data['loc'], 16) - 0x80_00_00_00
-        boxed = rdram[index:index + data['size']]
+    not_found = ""
+    for symbol, data in sorted(
+        symbols.items(), key=lambda x: int(x[1]["loc"] or "0x01", 16)
+    ):
+        if not data["loc"]:
+            not_found += "\t".join((symbol, data["file"]))
+            not_found += "\n"
+            continue
+        index = int(data["loc"], 16) - 0x80_00_00_00
+        boxed = rdram[index : index + data["size"]]
         if data["int_type"]:
             boxed = int.from_bytes(boxed, byteorder="big")
         elif data["bool_type"]:
@@ -45,6 +55,8 @@ def find(binfile, symbols, show_hex, do_base64):
             continue
         print(f"{symbol}@{data['loc']} =", boxed)
 
+    print("NOT FOUND\n\n", not_found)
+
 
 def main():
     # It's hard to know what the cause of the freeze is. So what I hope we can
@@ -54,10 +66,12 @@ def main():
     hex_address = re.compile("0x[0-9A-F]{8}")
     parser = argparse.ArgumentParser()
     parser.add_argument("bin", help="The binary file to search")
-    parser.add_argument("--show_hex", action='store_true',
-                        help="Print the full hex value")
-    parser.add_argument("--base64", action='store_true',
-                        help="Print the bas64 of the bytes")
+    parser.add_argument(
+        "--show_hex", action="store_true", help="Print the full hex value"
+    )
+    parser.add_argument(
+        "--base64", action="store_true", help="Print the bas64 of the bytes"
+    )
     args = parser.parse_args()
 
     if args.show_hex and args.base64:
@@ -66,16 +80,19 @@ def main():
 
     # lets get the location
     all_symbol_locations = dict()
-    for f in ("symbol_addrs.txt", "symbol_addrs_nlib_vars.txt",
-              "symbol_addrs_overlays.txt"):
+    for f in (
+        "symbol_addrs.txt",
+        "symbol_addrs_nlib_vars.txt",
+        "symbol_addrs_overlays.txt",
+    ):
         with open(os.path.join("linker_scripts/us/rev0", f)) as h:
-            for sym in [x for x in h.read().strip().split("\n")
-                        if x and "=" in x]:
+            for sym in [x for x in h.read().strip().split("\n") if x and "=" in x]:
                 addrs = hex_address.findall(sym)
-                key = sym[:sym.index("=")-1]
+                key = sym[: sym.index("=") - 1]
                 all_symbol_locations[key] = addrs[0]
     flags = [
-        "-x", "c",
+        "-x",
+        "c",
         "-std=gnu89",
         "-I./include",
         "-Ibin/us/rev0",
@@ -85,17 +102,10 @@ def main():
         "-I./include/libc",
         "-I./include/libultra",
         "-D_LANGUAGE_C",
-        "-target mips64-unknown-elf"
+        "-target mips64-unknown-elf",
     ]
 
-    int_types = {
-        "s32",
-        "s16",
-        "s64",
-        "u32",
-        "u16",
-        "u64"
-    }
+    int_types = {"s32", "s16", "s64", "u32", "u16", "u64"}
 
     float_types = {
         "float",
@@ -120,20 +130,22 @@ def main():
                     size = 4
                 else:
                     size = node.type.get_size()
-                if (size < 0):
+                if size < 0:
                     continue
-                if node.spelling in all_symbol_locations.keys():
-                    vars[node.spelling] = {
-                        "size": size,
-                        "loc": all_symbol_locations[node.spelling],
-                        "int_type": node.type.spelling in int_types,
-                        "float_type": node.type.spelling in float_types,
-                        "bool_type": node.type.spelling in bool_types}
+                vars[node.spelling] = {
+                    "size": size,
+                    "loc": all_symbol_locations.get(node.spelling, None),
+                    "int_type": node.type.spelling in int_types,
+                    "float_type": node.type.spelling in float_types,
+                    "bool_type": node.type.spelling in bool_types,
+                    "file": f,
+                }
         return vars
-    with multiprocessing.pool.ThreadPool() as pool:
+
+    with multiprocessing.pool.ThreadPool(4) as pool:
         all_symbols = functools.reduce(
-            operator.ior,
-            pool.map(scan, glob.glob("**/*.c", recursive=True)))
+            operator.ior, pool.map(scan, glob.glob("**/*.c", recursive=True))
+        )
     print("Loaded all symbols")
     find(args.bin, all_symbols, args.show_hex, args.base64)
 

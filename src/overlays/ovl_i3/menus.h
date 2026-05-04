@@ -163,5 +163,6 @@ Gfx* Menus_DrawRaceMenuTexture(Gfx* gfx, s32 textureIndex, s32 left, s32 top);
 s32 Menus_UpdateHighlightedOptionVertical(s32 playerIndex, s32 highlightedOption, s32 maxOptionValue);
 
 void Menus_GetFastestGhostInfo(void);
+void Menus_ReloadAssets(void);
 
 #endif // MENUS_H

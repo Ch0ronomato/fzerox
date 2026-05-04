@@ -7,8 +7,21 @@ import operator
 import os.path
 import sys
 import yaml
-loc = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/libclang.dylib"
-clang.cindex.Config.set_library_file(loc)
+
+LIBCLANG_CANDIDATES = (
+    "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/libclang.dylib",
+    "/usr/lib/x86_64-linux-gnu/libclang-14.so.14.0.0",
+    "/lib/x86_64-linux-gnu/libclang-14.so.14.0.0",
+)
+
+for loc in LIBCLANG_CANDIDATES:
+    if os.path.exists(loc):
+        clang.cindex.Config.set_library_file(loc)
+        break
+
+SAVE_METADATA_SIZE = 12
+SAVE_ARENA_FRONTIER_SIZE = 24
+POINTER_SIZE = 4
 
 with open("pointers.yaml") as f:
     pointers = yaml.safe_load(f)
@@ -61,11 +74,45 @@ class GameState:
         return self._canonical.kind == clang.cindex.TypeKind.POINTER
 
     @property
+    def is_pointer_array(self):
+        if not self.is_array:
+            return False
+        base, _ = _collect_array_dims(self._canonical)
+        return base.kind == clang.cindex.TypeKind.POINTER
+
+    @property
+    def storage_size(self):
+        if self.is_pointer:
+            return POINTER_SIZE
+
+        if self.is_pointer_array:
+            _, dims = _collect_array_dims(self._canonical)
+            total = 1
+            for dim in dims:
+                if dim is None or dim < 0:
+                    return self.Size
+                total *= dim
+            return total * POINTER_SIZE
+
+        return self.Size
+
+    @property
     def is_function_pointer(self):
         t = self._canonical
         if t.kind != clang.cindex.TypeKind.POINTER:
             return False
         return t.get_pointee().kind == clang.cindex.TypeKind.FUNCTIONPROTO
+
+    @property
+    def skips_raw_pointer_storage(self):
+        if not (self.is_pointer or self.is_pointer_array):
+            return False
+        return self.pointer_policy in {
+            "PTR_LEAVE_AS_IS",
+            "PTR_RESTORE_REF",
+            "PTR_SET_NULL",
+            "PTR_RECOMPUTE",
+        }
 
     @property
     def is_const(self):
@@ -121,8 +168,11 @@ class GameState:
         if self.is_function_pointer:
             return ""
 
+        if self.skips_raw_pointer_storage:
+            return ""
+
         name = self.Name
-        size = self.Size
+        size = self.storage_size
 
         # Array: decay to pointer automatically
         if self.is_array:
@@ -142,8 +192,11 @@ class GameState:
         if self.is_function_pointer:
             return ""
 
+        if self.skips_raw_pointer_storage:
+            return ""
+
         name = self.Name
-        size = self.Size
+        size = self.storage_size
 
         # Array: decay to pointer automatically
         if self.is_array:
@@ -175,7 +228,7 @@ def generate_pointer_relocs(game_states):
     for gs in sorted(game_states, key=lambda x: x.Name):
         policy = pointers['pointers'].get(gs.Name)
 
-        if not policy or policy == "PTR_LEAVE_AS_IS":
+        if policy != "PTR_RESTORE_REF":
             continue
         if not gs.is_pointer:
             continue
@@ -203,10 +256,7 @@ def generate_pointer_relocs(game_states):
                 save_lines.append(f"            else if {cond}")
             save_lines.append("            {")
             save_lines.append(f"                arena_index = {i};")
-            save_lines.append(
-                f"                offset_val = (u32)((uintptr_t){
-                    name} - gArenaStartPtrs[{i}]);"
-            )
+            save_lines.append(f"                offset_val = (u32)((uintptr_t){name} - gArenaStartPtrs[{i}]);")
             save_lines.append("            }")
         save_lines.append("        }")
         save_lines.append("")
@@ -230,10 +280,7 @@ def generate_pointer_relocs(game_states):
         load_lines.append("")
         load_lines.append("        if (arena_index >= 0)")
         load_lines.append("        {")
-        load_lines.append(
-            f"            {
-                name} = (void*)(gArenaStartPtrs[arena_index] + offset_val);"
-        )
+        load_lines.append(f"            {name} = (void*)(gArenaStartPtrs[arena_index] + offset_val);")
         load_lines.append("        }")
         load_lines.append("        else")
         load_lines.append("        {")
@@ -297,6 +344,12 @@ for segment in (main, ovl_2, ovl_3):
             files.add(os.path.join(
                 "src", segment.get("dir", ""), sub[2]) + ".c")
 
+# Some live race state lives in dedicated BSS segments rather than the main/overlay C subsegment lists.
+files.update({
+    "src/game/game_context.c",
+    "src/game/course_gadget_context.c",
+})
+
 # lets start gathering data
 flags = [
     "-x", "c",
@@ -341,14 +394,18 @@ for file, ast in asts.items():
                                         node.type.spelling, size, node))
 print(vars, f"{total_size / 1000} kb")
 v = 0
+global_state_size = 0
 for k, vars in itertools.groupby(sorted(usage), key=operator.attrgetter("File")):
     externs = []
     memcpys = []
     loads = []
     for var in filter(lambda x: x.record_pointer(), vars):
         externs.append(var.extern)
-        memcpys.append(var.save)
-        loads.append(var.load)
+        if var.save:
+            memcpys.append(var.save)
+            global_state_size += var.storage_size
+        if var.load:
+            loads.append(var.load)
     with open(f"src/mod/{k}.c.inc", "w") as fw:
         fw.write("\n".join(externs))
         fw.write(f"\nstatic u32 {k}__save(u8* out, u32 off)")
@@ -366,6 +423,14 @@ for k, vars in itertools.groupby(sorted(usage), key=operator.attrgetter("File"))
         fw.write("\n")
 
 
+pointer_reloc_count = sum(
+    1 for gs in usage
+    if gs.pointer_policy == "PTR_RESTORE_REF" and gs.is_pointer and gs.record_pointer()
+)
+pointer_reloc_size = pointer_reloc_count * (2 + 4)
+header_size = SAVE_METADATA_SIZE + global_state_size + pointer_reloc_size + SAVE_ARENA_FRONTIER_SIZE + 4
+header_buffer_size = (header_size + 511) & ~511
+
 with open("src/mod/save_runner.c.inc", "w") as f:
     includes = []
     calls = []
@@ -374,6 +439,10 @@ with open("src/mod/save_runner.c.inc", "w") as f:
         includes.append(f"#include \"src/mod/{k}.c.inc\"")
         calls.append(f"off = {k}__save(out, off);")
         read_calls.append(f"off = {k}__load(out, off);")
+    f.write(f"#define MOD_GLOBAL_STATE_SIZE {global_state_size}\n")
+    f.write(f"#define MOD_POINTER_RELOC_SIZE {pointer_reloc_size}\n")
+    f.write(f"#define MOD_HEADER_SIZE {header_size}\n")
+    f.write(f"#define MOD_HEADER_BUFFER_SIZE {header_buffer_size}\n")
     f.write("\n".join(includes))
     f.write("\nu32 global_write(u8* out, u32 off)")
     f.write("\n{")

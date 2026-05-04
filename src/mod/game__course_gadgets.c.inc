@@ -35,11 +35,14 @@ static u32 game__course_gadgets__load(u8* out, u32 off)
 {
 	off = mod_read_bytes(out, off, &D_800CD1E8, 4);
 	off = mod_read_bytes(out, off, &D_800CD21C, 4);
-	off = mod_read_bytes(out, off, D_800CD220, 88);
-	off = mod_read_bytes(out, off, D_800CD24C, 152);
+	off = mod_read_bytes(out, off, D_800CD220, sizeof(D_800CD220));
+	off += 88 - sizeof(D_800CD220);
+	off = mod_read_bytes(out, off, D_800CD24C, sizeof(D_800CD24C));
+	off += 152 - sizeof(D_800CD24C);
 	off = mod_read_bytes(out, off, D_800E12B8, 8);
 	off = mod_read_bytes(out, off, D_800E12C4, 4);
-	off = mod_read_bytes(out, off, D_800E12C8, 16384);
+	off = mod_read_bytes(out, off, D_800E12C8, sizeof(D_800E12C8));
+	off += 16384 - sizeof(D_800E12C8);
 	off = mod_read_bytes(out, off, &D_800E32CC, 4);
 	off = mod_read_bytes(out, off, &gInCourseEditor, 4);
 	off = mod_read_bytes(out, off, &sCourseDecorationTextureLoadState, 4);

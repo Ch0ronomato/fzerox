@@ -57,6 +57,12 @@ extern short sSpritePaletteReplacementCount;
 extern long sStarCount;
 extern void * sStarTexture;
 extern struct Star sStars[100];
+extern void * sBackgroundSpritePalettePairs[][2];
+extern long gSkyboxType;
+extern long gVenueType;
+extern void * func_80078104(void * arg0, long textureSize, long arg2, long arg3, int arg4);
+extern struct CourseSkyboxes * sCourseSkyboxes[];
+extern struct CourseVenueFloor * sCourseVenueFloors[];
 extern struct CourseVenueFloor sVenueFloorBigBlue;
 extern struct CourseVenueFloor sVenueFloorDevilsForest;
 extern struct CourseVenueFloor sVenueFloorFireField;
@@ -140,70 +146,100 @@ static u32 overlays__ovl_i3__background__save(u8* out, u32 off)
 
 static u32 overlays__ovl_i3__background__load(u8* out, u32 off)
 {
-	off = mod_read_bytes(out, off, D_i3_8006C538, 80);
+	s32 i;
+
+	off = mod_read_bytes(out, off, D_i3_8006C538, sizeof(D_i3_8006C538));
+	off += 80 - sizeof(D_i3_8006C538);
 	off = mod_read_bytes(out, off, &sBackgroundCount, 4);
-	off = mod_read_bytes(out, off, &sBackgroundCtx, 16);
+	off += 16;
+	if ((gVenueType >= 0) && (gVenueType <= 10) && (gSkyboxType >= 0) && (gSkyboxType <= 7)) {
+		sBackgroundCtx.venueFloor = sCourseVenueFloors[gVenueType];
+		sBackgroundCtx.skybox = sCourseSkyboxes[gSkyboxType];
+	} else {
+		sBackgroundCtx.venueFloor = 0;
+		sBackgroundCtx.skybox = 0;
+	}
 	off = mod_read_bytes(out, off, sBackgroundFlashingColors, 9);
 	off = mod_read_bytes(out, off, &sBackgroundScale, 4);
 	off = mod_read_bytes(out, off, &sBackgroundSpriteB, 2);
 	off = mod_read_bytes(out, off, &sBackgroundSpriteCount, 2);
 	off = mod_read_bytes(out, off, &sBackgroundSpriteG, 2);
 	off = mod_read_bytes(out, off, &sBackgroundSpriteHeight, 4);
-	off = mod_read_bytes(out, off, sBackgroundSpriteInitBigBlue, 56);
-	off = mod_read_bytes(out, off, sBackgroundSpriteInitBigBlue2, 32);
-	off = mod_read_bytes(out, off, sBackgroundSpriteInitBigHand, 48);
-	off = mod_read_bytes(out, off, sBackgroundSpriteInitDevilsForest, 56);
-	off = mod_read_bytes(out, off, sBackgroundSpriteInitDevilsForest2, 56);
-	off = mod_read_bytes(out, off, sBackgroundSpriteInitDevilsForest3, 8);
-	off = mod_read_bytes(out, off, sBackgroundSpriteInitEnding, 56);
-	off = mod_read_bytes(out, off, sBackgroundSpriteInitFireField, 8);
-	off = mod_read_bytes(out, off, sBackgroundSpriteInitMuteCity, 56);
-	off = mod_read_bytes(out, off, sBackgroundSpriteInitMuteCity2, 56);
-	off = mod_read_bytes(out, off, sBackgroundSpriteInitMuteCity3, 56);
-	off = mod_read_bytes(out, off, sBackgroundSpriteInitPortTown, 32);
-	off = mod_read_bytes(out, off, sBackgroundSpriteInitPortTown2, 32);
-	off = mod_read_bytes(out, off, sBackgroundSpriteInitRainbowRoad, 8);
-	off = mod_read_bytes(out, off, sBackgroundSpriteInitRedCanyon, 56);
-	off = mod_read_bytes(out, off, sBackgroundSpriteInitRedCanyon2, 8);
-	off = mod_read_bytes(out, off, sBackgroundSpriteInitSandOcean, 56);
-	off = mod_read_bytes(out, off, sBackgroundSpriteInitSandOcean2, 8);
-	off = mod_read_bytes(out, off, sBackgroundSpriteInitSectorAlpha, 32);
-	off = mod_read_bytes(out, off, sBackgroundSpriteInitSectorBeta, 32);
-	off = mod_read_bytes(out, off, sBackgroundSpriteInitSilence, 24);
-	off = mod_read_bytes(out, off, sBackgroundSpriteInitSilence2, 8);
-	off = mod_read_bytes(out, off, sBackgroundSpriteInitSpacePlant, 32);
-	off = mod_read_bytes(out, off, sBackgroundSpriteInitWhiteLand, 32);
-	off = mod_read_bytes(out, off, sBackgroundSpriteInitWhiteLand2, 8);
+	off += 56;
+	off += 32;
+	off += 48;
+	off += 56;
+	off += 56;
+	off += 8;
+	off += 56;
+	off += 8;
+	off += 56;
+	off += 56;
+	off += 56;
+	off += 32;
+	off += 32;
+	off += 8;
+	off += 56;
+	off += 8;
+	off += 56;
+	off += 8;
+	off += 32;
+	off += 32;
+	off += 24;
+	off += 8;
+	off += 32;
+	off += 32;
+	off += 8;
 	off = mod_read_bytes(out, off, sBackgroundSpritePaletteReplacements, 216);
 	off = mod_read_bytes(out, off, &sBackgroundSpriteR, 2);
 	off = mod_read_bytes(out, off, &sBackgroundSpriteScale, 4);
-	off = mod_read_bytes(out, off, sBackgroundSprites, 240);
-	off = mod_read_bytes(out, off, sBackgrounds, 384);
+	off = mod_read_bytes(out, off, sBackgroundSprites, sizeof(sBackgroundSprites));
+	off += 240 - sizeof(sBackgroundSprites);
+	for (i = 0; i < 6; i++) {
+		void** texturePalettePair;
+
+		if ((sBackgroundSprites[i].spriteId < 0) || (sBackgroundSprites[i].spriteId > 55)) {
+			sBackgroundSprites[i].spriteId = 0;
+			sBackgroundSprites[i].isVisible = 0;
+		}
+		texturePalettePair = sBackgroundSpritePalettePairs[sBackgroundSprites[i].spriteId];
+		sBackgroundSprites[i].texture = 0;
+		sBackgroundSprites[i].palette = 0;
+		if (texturePalettePair[0] != 0) {
+			sBackgroundSprites[i].texture = func_80078104(texturePalettePair[0], 64 * 64 / 2, 0, 0, 0);
+		}
+		if (texturePalettePair[1] != 0) {
+			sBackgroundSprites[i].palette = func_80078104(texturePalettePair[1], 16 * 1 * sizeof(unsigned short), 0, 0, 0);
+		}
+	}
+	off = mod_read_bytes(out, off, sBackgrounds, sizeof(sBackgrounds));
+	off += 384 - sizeof(sBackgrounds);
 	off = mod_read_bytes(out, off, &sCloudCount, 4);
-	off = mod_read_bytes(out, off, sDaytimeBackgroundSprites, 68);
+	off += 68;
 	off = mod_read_bytes(out, off, &sIsEndingCutscene, 2);
-	off = mod_read_bytes(out, off, sNighttimeBackgroundSprites, 28);
-	off = mod_read_bytes(out, off, &sSkyboxBlue, 24);
-	off = mod_read_bytes(out, off, &sSkyboxDesert, 24);
+	off += 28;
+	off += 24;
+	off += 24;
 	off = mod_read_bytes(out, off, &sSkyboxFlags, 2);
-	off = mod_read_bytes(out, off, &sSkyboxNight, 24);
-	off = mod_read_bytes(out, off, &sSkyboxOrange, 24);
-	off = mod_read_bytes(out, off, &sSkyboxPurple, 24);
-	off = mod_read_bytes(out, off, &sSkyboxSkyBlue, 24);
-	off = mod_read_bytes(out, off, &sSkyboxSunset, 24);
-	off = mod_read_bytes(out, off, &sSkyboxTurquoise, 24);
+	off += 24;
+	off += 24;
+	off += 24;
+	off += 24;
+	off += 24;
+	off += 24;
 	off = mod_read_bytes(out, off, &sSpritePaletteReplacementCount, 2);
 	off = mod_read_bytes(out, off, &sStarCount, 4);
-	off = mod_read_bytes(out, off, sStars, 5200);
-	off = mod_read_bytes(out, off, &sVenueFloorBigBlue, 24);
-	off = mod_read_bytes(out, off, &sVenueFloorDevilsForest, 24);
-	off = mod_read_bytes(out, off, &sVenueFloorFireField, 24);
-	off = mod_read_bytes(out, off, &sVenueFloorMuteCity, 24);
-	off = mod_read_bytes(out, off, &sVenueFloorPortTown, 24);
-	off = mod_read_bytes(out, off, &sVenueFloorRedCanyon, 24);
-	off = mod_read_bytes(out, off, &sVenueFloorSandOcean, 24);
-	off = mod_read_bytes(out, off, &sVenueFloorSector, 24);
-	off = mod_read_bytes(out, off, &sVenueFloorSilence, 24);
-	off = mod_read_bytes(out, off, &sVenueFloorWhiteLand, 24);
+	off = mod_read_bytes(out, off, sStars, sizeof(sStars));
+	off += 5200 - sizeof(sStars);
+	off += 24;
+	off += 24;
+	off += 24;
+	off += 24;
+	off += 24;
+	off += 24;
+	off += 24;
+	off += 24;
+	off += 24;
+	off += 24;
 	return off;
 }

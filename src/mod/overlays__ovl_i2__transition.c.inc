@@ -13,6 +13,7 @@ static u32 overlays__ovl_i2__transition__load(u8* out, u32 off)
 {
 	off = mod_read_bytes(out, off, &D_i2_80106DA0, 2);
 	off = mod_read_bytes(out, off, D_i2_80106DB8, 16);
-	off = mod_read_bytes(out, off, kTransitionRandomSelection, 56);
+	off = mod_read_bytes(out, off, kTransitionRandomSelection, sizeof(kTransitionRandomSelection));
+	off += 56 - sizeof(kTransitionRandomSelection);
 	return off;
 }

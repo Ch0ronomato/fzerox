@@ -45,35 +45,35 @@ pointers:
 
   # --- Runtime pointers (prefer relocatable restore) ---
   gCurAudioTask: PTR_RESTORE_REF
-  D_800E12C0: PTR_RESTORE_REF
-  sTerrainEffectVtxStart: PTR_RESTORE_REF
+  D_800E12C0: PTR_RECOMPUTE
+  sTerrainEffectVtxStart: PTR_RECOMPUTE
 
-  sLastRacer: PTR_RESTORE_REF
-  sRivalRacer: PTR_RESTORE_REF
-  sPlayerRacer: PTR_RESTORE_REF
+  sLastRacer: PTR_RECOMPUTE
+  sRivalRacer: PTR_RECOMPUTE
+  sPlayerRacer: PTR_RECOMPUTE
 
-  gEffectsVtxPtr: PTR_RESTORE_REF
-  gEffectsVtxEndPtr: PTR_RESTORE_REF
-  gCourseVtxPtr: PTR_RESTORE_REF
+  gEffectsVtxPtr: PTR_RECOMPUTE
+  gEffectsVtxEndPtr: PTR_RECOMPUTE
+  gCourseVtxPtr: PTR_RECOMPUTE
 
-  gRacersByPosition: PTR_RESTORE_REF
+  gRacersByPosition: PTR_RECOMPUTE
 
-  sPipeFogColors: PTR_RESTORE_REF
-  sTunnelFogColors: PTR_RESTORE_REF
+  sPipeFogColors: PTR_RECOMPUTE
+  sTunnelFogColors: PTR_RECOMPUTE
 
-  gFastestGhost: PTR_RESTORE_REF
-  gFastestGhostRacer: PTR_RESTORE_REF
-  sFastestGhostRacerRacer: PTR_RESTORE_REF
-  sGhostReplayRecordingPtr: PTR_RESTORE_REF
+  gFastestGhost: PTR_RECOMPUTE
+  gFastestGhostRacer: PTR_RECOMPUTE
+  sFastestGhostRacerRacer: PTR_RECOMPUTE
+  sGhostReplayRecordingPtr: PTR_RECOMPUTE
 
-  gCurrentCourseInfo: PTR_RESTORE_REF
-  sLastSegmentChunk: PTR_RESTORE_REF
+  gCurrentCourseInfo: PTR_RECOMPUTE
+  sLastSegmentChunk: PTR_RECOMPUTE
   sCourseDisp: PTR_RESTORE_REF
-  D_800F89B8: PTR_RESTORE_REF
-  D_800F89BC: PTR_RESTORE_REF
-  D_800F89C8: PTR_RESTORE_REF
-  sWorkingSegmentChunk: PTR_RESTORE_REF
-  sWorkingNextSegmentChunk: PTR_RESTORE_REF
+  D_800F89B8: PTR_LEAVE_AS_IS
+  D_800F89BC: PTR_LEAVE_AS_IS
+  D_800F89C8: PTR_LEAVE_AS_IS
+  sWorkingSegmentChunk: PTR_LEAVE_AS_IS
+  sWorkingNextSegmentChunk: PTR_LEAVE_AS_IS
 
   sTransitionPalettePtr: PTR_RESTORE_REF
 
@@ -84,13 +84,19 @@ pointers:
   sWinnerPalette: PTR_RESTORE_REF
   sLoserTexture: PTR_RESTORE_REF
   sLoserPalette: PTR_RESTORE_REF
+  sCloudTexture: PTR_RESTORE_REF
+  sSkyboxTexture: PTR_RESTORE_REF
+  sStarTexture: PTR_RESTORE_REF
+  sVenueFloorTexture: PTR_RESTORE_REF
 
   # --- Device/OS handles / special cases ---
   gSramPiHandlePtr: PTR_RECOMPUTE
+  D_800E12B0: PTR_LEAVE_AS_IS
 
   # --- Derived presentation state (rebuild instead of restoring raw pointers) ---
   gCurrentTrackName: PTR_RECOMPUTE
   gTrackNames: PTR_RECOMPUTE
+  sRaceMenuTextures: PTR_LEAVE_AS_IS
 
   # --- Mostly-null/unused ---
   sUnusedHandler: PTR_LEAVE_AS_IS
@@ -149,6 +155,8 @@ skip_vars:
 
   # --- Rendering pipeline / display list control ---
   - sCourseDisp
+  - D_800F8958
+  - sSegmentChunkGroups
   - D_i3_8013DBE0
   - D_i3_8013DBE8
   - D_i3_80141900

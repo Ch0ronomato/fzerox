@@ -292,6 +292,10 @@ void func_i3_8012F324(void) {
     }
 }
 
+void Hud_ReloadAssets(void) {
+    func_80078104(aBestTex, TEX_SIZE(aBestTex, sizeof(u16)), 0, 0, 0);
+}
+
 void func_i3_8012F450(unk_8012F450* arg0) {
 
     if (arg0->time < 360000) {

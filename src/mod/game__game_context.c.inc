@@ -13,9 +13,13 @@ static u32 game__game_context__save(u8* out, u32 off)
 
 static u32 game__game_context__load(u8* out, u32 off)
 {
-	off = mod_read_bytes(out, off, D_802C2020, 13824);
-	off = mod_read_bytes(out, off, gCourseInfos, 16576);
-	off = mod_read_bytes(out, off, gRacers, 33840);
-	off = mod_read_bytes(out, off, gSegmentChunks, 106600);
+	off = mod_read_bytes(out, off, D_802C2020, sizeof(D_802C2020));
+	off += 13824 - sizeof(D_802C2020);
+	off = mod_read_bytes(out, off, gCourseInfos, sizeof(gCourseInfos));
+	off += 16576 - sizeof(gCourseInfos);
+	off = mod_read_bytes(out, off, gRacers, sizeof(gRacers));
+	off += 33840 - sizeof(gRacers);
+	off = mod_read_bytes(out, off, gSegmentChunks, sizeof(gSegmentChunks));
+	off += 106600 - sizeof(gSegmentChunks);
 	return off;
 }

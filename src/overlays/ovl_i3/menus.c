@@ -212,12 +212,75 @@ s32 sRaceMenuDimensions[RACE_MENU_MAX * 2] = {
 };
 // clang-format on
 
+extern s32 gGameMode;
+
 void func_i3_8011AE70(void) {
     sMenuStateFlags = D_i3_801419B4 = 0;
 }
 
 void func_i3_8011AE88(void) {
     D_i3_801419A8 = D_i3_801419AC = 0;
+}
+
+static void Menus_LoadAssets(void) {
+    sRetireTexture = func_80078104(aRetireTex, TEX_SIZE(aRetireTex, sizeof(u8)), 0, 0, 0);
+    sRetirePalette = func_80078104(aRetireTLUT, TEX_SIZE(aRetireTLUT, sizeof(u16)), 0, 0, 0);
+    sWinnerTexture = NULL;
+    sWinnerPalette = NULL;
+    sLoserTexture = NULL;
+    sLoserPalette = NULL;
+
+    func_80078104(aMenuTextTLUT, 0x200, 0, 0, 0);
+    func_80078104(aMenuRetryTex, TEX_SIZE(aMenuRetryTex, sizeof(u8)), 0, 1, 0);
+    func_80078104(aMenuSettingsTex, TEX_SIZE(aMenuSettingsTex, sizeof(u8)), 0, 1, 0);
+    func_80078104(aMenuQuitTex, TEX_SIZE(aMenuQuitTex, sizeof(u8)), 0, 1, 0);
+    func_80078104(aMenuContinueTex, TEX_SIZE(aMenuContinueTex, sizeof(u8)), 0, 1, 0);
+
+    if (gGameMode == GAMEMODE_DEATH_RACE) {
+        func_80078104(aMenuChangeMachineTex, TEX_SIZE(aMenuChangeMachineTex, sizeof(u8)), 0, 1, 0);
+    }
+
+    if (gGameMode == GAMEMODE_TIME_ATTACK) {
+        func_80078104(aMenuChangeMachineTex, TEX_SIZE(aMenuChangeMachineTex, sizeof(u8)), 0, 1, 0);
+        func_80078104(aMenuChangeCourseTex, TEX_SIZE(aMenuChangeCourseTex, sizeof(u8)), 0, 1, 0);
+        func_80078104(aMenuGhostSaveTex, TEX_SIZE(aMenuGhostSaveTex, sizeof(u8)), 0, 1, 0);
+        func_80078104(aMenuOverwriteData1Tex, TEX_SIZE(aMenuOverwriteData1Tex, sizeof(u8)), 0, 1, 0);
+        func_80078104(aMenuSavedTex, TEX_SIZE(aMenuSavedTex, sizeof(u8)), 0, 1, 0);
+        func_80078104(aMenuSavingTex, TEX_SIZE(aMenuSavingTex, sizeof(u8)), 0, 1, 0);
+        func_80078104(aMenuYesTex, TEX_SIZE(aMenuYesTex, sizeof(u8)), 0, 1, 0);
+        func_80078104(aMenuNoTex, TEX_SIZE(aMenuNoTex, sizeof(u8)), 0, 1, 0);
+        func_80078104(aMenuNewGhostTex, TEX_SIZE(aMenuNewGhostTex, sizeof(u8)), 0, 1, 0);
+        func_80078104(aMenuSavedGhostTex, TEX_SIZE(aMenuSavedGhostTex, sizeof(u8)), 0, 1, 0);
+        func_80078104(aMenuCannotSaveGhostTex, TEX_SIZE(aMenuCannotSaveGhostTex, sizeof(u8)), 0, 1, 0);
+        func_80078104(aMenuLeftArrowTex, TEX_SIZE(aMenuLeftArrowTex, sizeof(u8)), 0, 1, 0);
+        func_80078104(aMenuRightArrowTex, TEX_SIZE(aMenuRightArrowTex, sizeof(u8)), 0, 1, 0);
+#ifdef EXPANSION_KIT
+        func_80078104(aMenuToGamePakTex, TEX_SIZE(aMenuToGamePakTex, sizeof(u8)), 0, 1, 0);
+        func_80078104(aMenuToDiskTex, TEX_SIZE(aMenuToDiskTex, sizeof(u8)), 0, 1, 0);
+        func_80078104(aMenuOverwriteData2Tex, TEX_SIZE(aMenuOverwriteData2Tex, sizeof(u8)), 0, 1, 0);
+#endif
+        sLoserTexture = func_80078104(aLoserTex, TEX_SIZE(aLoserTex, sizeof(u8)), 0, 0, 0);
+        sLoserPalette = func_80078104(aLoserTLUT, TEX_SIZE(aLoserTLUT, sizeof(u16)), 0, 0, 0);
+    }
+
+    if ((gGameMode == GAMEMODE_VS_2P) || (gGameMode == GAMEMODE_VS_3P) || (gGameMode == GAMEMODE_VS_4P) ||
+        (gGameMode == GAMEMODE_TIME_ATTACK)) {
+        sWinnerTexture = func_80078104(aWinnerTex, TEX_SIZE(aWinnerTex, sizeof(u8)), 0, 0, 0);
+        sWinnerPalette = func_80078104(aWinnerTLUT, TEX_SIZE(aWinnerTLUT, sizeof(u16)), 0, 0, 0);
+    }
+
+    if ((gGameMode == GAMEMODE_PRACTICE) || (gGameMode == GAMEMODE_VS_2P) || (gGameMode == GAMEMODE_VS_3P) ||
+        (gGameMode == GAMEMODE_VS_4P)) {
+        func_80078104(aMenuChangeMachineTex, TEX_SIZE(aMenuChangeMachineTex, sizeof(u8)), 0, 1, 0);
+        func_80078104(aMenuChangeCourseTex, TEX_SIZE(aMenuChangeCourseTex, sizeof(u8)), 0, 1, 0);
+        func_80078104(D_F25D858, TEX_SIZE(D_F25D858, sizeof(u16)), 0, 0, 0);
+        func_80078104(D_F25E060, TEX_SIZE(D_F25E060, sizeof(u16)), 0, 0, 0);
+        func_80078104(D_F25E868, TEX_SIZE(D_F25E868, sizeof(u16)), 0, 0, 0);
+    }
+}
+
+void Menus_ReloadAssets(void) {
+    Menus_LoadAssets();
 }
 
 extern s8 gGamePaused;
@@ -415,39 +478,12 @@ void Menus_Init(void) {
     sGpResultsEndMenuScissorBoxTimer = sGeneralRaceMenuScissorBoxTimer = 60;
     sSaveGhostMenuState = GHOST_SAVE_MENU_CLOSED;
     sPlayer1Lives = gPlayerLives[0];
-    sRetireTexture = func_80078104(aRetireTex, TEX_SIZE(aRetireTex, sizeof(u8)), 0, 0, 0);
-    sRetirePalette = func_80078104(aRetireTLUT, TEX_SIZE(aRetireTLUT, sizeof(u16)), 0, 0, 0);
-    func_80078104(aMenuTextTLUT, 0x200, 0, 0, 0);
-    func_80078104(aMenuRetryTex, TEX_SIZE(aMenuRetryTex, sizeof(u8)), 0, 1, 0);
-    func_80078104(aMenuSettingsTex, TEX_SIZE(aMenuSettingsTex, sizeof(u8)), 0, 1, 0);
-    func_80078104(aMenuQuitTex, TEX_SIZE(aMenuQuitTex, sizeof(u8)), 0, 1, 0);
-    func_80078104(aMenuContinueTex, TEX_SIZE(aMenuContinueTex, sizeof(u8)), 0, 1, 0);
+    Menus_LoadAssets();
 
     if (gGameMode == GAMEMODE_DEATH_RACE) {
-        func_80078104(aMenuChangeMachineTex, TEX_SIZE(aMenuChangeMachineTex, sizeof(u8)), 0, 1, 0);
         func_80078104(aBestTex, TEX_SIZE(aBestTex, sizeof(u16)), 0, 0, 0);
     }
     if (gGameMode == GAMEMODE_TIME_ATTACK) {
-        func_80078104(aMenuChangeMachineTex, TEX_SIZE(aMenuChangeMachineTex, sizeof(u8)), 0, 1, 0);
-        func_80078104(aMenuChangeCourseTex, TEX_SIZE(aMenuChangeCourseTex, sizeof(u8)), 0, 1, 0);
-        func_80078104(aMenuGhostSaveTex, TEX_SIZE(aMenuGhostSaveTex, sizeof(u8)), 0, 1, 0);
-        func_80078104(aMenuOverwriteData1Tex, TEX_SIZE(aMenuOverwriteData1Tex, sizeof(u8)), 0, 1, 0);
-        func_80078104(aMenuSavedTex, TEX_SIZE(aMenuSavedTex, sizeof(u8)), 0, 1, 0);
-        func_80078104(aMenuSavingTex, TEX_SIZE(aMenuSavingTex, sizeof(u8)), 0, 1, 0);
-        func_80078104(aMenuYesTex, TEX_SIZE(aMenuYesTex, sizeof(u8)), 0, 1, 0);
-        func_80078104(aMenuNoTex, TEX_SIZE(aMenuNoTex, sizeof(u8)), 0, 1, 0);
-        func_80078104(aMenuNewGhostTex, TEX_SIZE(aMenuNewGhostTex, sizeof(u8)), 0, 1, 0);
-        func_80078104(aMenuSavedGhostTex, TEX_SIZE(aMenuSavedGhostTex, sizeof(u8)), 0, 1, 0);
-        func_80078104(aMenuCannotSaveGhostTex, TEX_SIZE(aMenuCannotSaveGhostTex, sizeof(u8)), 0, 1, 0);
-        func_80078104(aMenuLeftArrowTex, TEX_SIZE(aMenuLeftArrowTex, sizeof(u8)), 0, 1, 0);
-        func_80078104(aMenuRightArrowTex, TEX_SIZE(aMenuRightArrowTex, sizeof(u8)), 0, 1, 0);
-#ifdef EXPANSION_KIT
-        func_80078104(aMenuToGamePakTex, TEX_SIZE(aMenuToGamePakTex, sizeof(u8)), 0, 1, 0);
-        func_80078104(aMenuToDiskTex, TEX_SIZE(aMenuToDiskTex, sizeof(u8)), 0, 1, 0);
-        func_80078104(aMenuOverwriteData2Tex, TEX_SIZE(aMenuOverwriteData2Tex, sizeof(u8)), 0, 1, 0);
-#endif
-        sLoserTexture = func_80078104(aLoserTex, TEX_SIZE(aLoserTex, sizeof(u8)), 0, 0, 0);
-        sLoserPalette = func_80078104(aLoserTLUT, TEX_SIZE(aLoserTLUT, sizeof(u16)), 0, 0, 0);
         Menus_GetFastestGhostInfo();
         if (gFastestGhostIndex >= 0) {
             sFastestGhostRacerRacer = gFastestGhostRacer->racer;
@@ -456,19 +492,8 @@ void Menus_Init(void) {
         }
     }
 
-    if ((gGameMode == GAMEMODE_VS_2P) || (gGameMode == GAMEMODE_VS_3P) || (gGameMode == GAMEMODE_VS_4P) ||
-        (gGameMode == GAMEMODE_TIME_ATTACK)) {
-        sWinnerTexture = func_80078104(aWinnerTex, TEX_SIZE(aWinnerTex, sizeof(u8)), 0, 0, 0);
-        sWinnerPalette = func_80078104(aWinnerTLUT, TEX_SIZE(aWinnerTLUT, sizeof(u16)), 0, 0, 0);
-    }
     if ((gGameMode == GAMEMODE_PRACTICE) || (gGameMode == GAMEMODE_VS_2P) || (gGameMode == GAMEMODE_VS_3P) ||
         (gGameMode == GAMEMODE_VS_4P)) {
-        func_80078104(aMenuChangeMachineTex, TEX_SIZE(aMenuChangeMachineTex, sizeof(u8)), 0, 1, 0);
-        func_80078104(aMenuChangeCourseTex, TEX_SIZE(aMenuChangeCourseTex, sizeof(u8)), 0, 1, 0);
-        func_80078104(D_F25D858, TEX_SIZE(D_F25D858, sizeof(u16)), 0, 0, 0);
-        func_80078104(D_F25E060, TEX_SIZE(D_F25E060, sizeof(u16)), 0, 0, 0);
-        func_80078104(D_F25E868, TEX_SIZE(D_F25E868, sizeof(u16)), 0, 0, 0);
-
         for (j = 0; j < 3; j++) {
             sVsSlotResultIndexToPortraitResult[0][j] = VS_SLOT_PORTRAIT_MR_ZERO;
             sVsSlotResultIndexToPortraitResult[1][j] = VS_SLOT_PORTRAIT_MR_ZERO;

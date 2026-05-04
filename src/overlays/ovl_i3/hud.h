@@ -41,5 +41,6 @@ Gfx* Hud_DrawDeathRaceBest(Gfx* gfx, s32 numPlayersIndex, s32 playerIndex);
 Gfx* Hud_DrawDeathRaceBestTime(Gfx* gfx, s32 numPlayersIndex, s32 playerIndex);
 
 void Hud_UpdateCharacterPortraits(void);
+void Hud_ReloadAssets(void);
 
 #endif // HUD_H

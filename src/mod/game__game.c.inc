@@ -45,7 +45,9 @@ static u32 game__game__load(u8* out, u32 off)
 	off = mod_read_bytes(out, off, &gNumPlayers, 4);
 	off = mod_read_bytes(out, off, &gTotalLapCount, 4);
 	off = mod_read_bytes(out, off, sTitleDemoCourses, 5);
-	off = mod_read_bytes(out, off, sTitleDemoGameModes, 24);
-	off = mod_read_bytes(out, off, sTitleDemoNumPlayers, 24);
+	off = mod_read_bytes(out, off, sTitleDemoGameModes, sizeof(sTitleDemoGameModes));
+	off += 24 - sizeof(sTitleDemoGameModes);
+	off = mod_read_bytes(out, off, sTitleDemoNumPlayers, sizeof(sTitleDemoNumPlayers));
+	off += 24 - sizeof(sTitleDemoNumPlayers);
 	return off;
 }

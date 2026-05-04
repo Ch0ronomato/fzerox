@@ -17,6 +17,9 @@ static u32 audio__rom__lib__load__load(u8* out, u32 off)
 	off = mod_read_bytes(out, off, &D_800F8AB4, 4);
 	off = mod_read_bytes(out, off, &D_800F8AB8, 4);
 	off = mod_read_bytes(out, off, D_800F8ABC, 48);
-	off = mod_read_bytes(out, off, &gSlowLoads, 392);
+	off += 392;
+	gSlowLoads.slowLoadPos = 0;
+	gSlowLoads.slowLoad[0].state = 0;
+	gSlowLoads.slowLoad[1].state = 0;
 	return off;
 }

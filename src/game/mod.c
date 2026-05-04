@@ -20,6 +20,7 @@
 #include "src/overlays/ovl_i2/transition.h"
 #include "src/overlays/ovl_i3/background.h"
 #include "src/overlays/ovl_i3/hud.h"
+#include "src/overlays/ovl_i3/menus.h"
 #include "src/overlays/ovl_i3/ovl_i3.h"
 #include "src/overlays/ovl_i3/records_entry.h"
 #include "segment_symbols.h"
@@ -61,10 +62,16 @@ typedef struct SegmentChunkGroup {
     s32 drawState;
 } SegmentChunkGroup; // size = 0x10
 
+typedef void (*ModSegmentChunkCalculateReferencePosFunc)(SegmentChunk*, f32, f32, Mtx3F*, Vec3f*, Vec3f*, Vec3f*,
+                                                         Vec3f*, Vec3f*);
+typedef void (*ModSegmentChunkJoinFunc)(SegmentChunk*, SegmentChunk*, f32);
+
 #ifndef EXPANSION_KIT
 #define MOD_SEGMENT_CHUNK_GROUP_COUNT 64
+#define MOD_SEGMENT_CHUNK_STORAGE_COUNT 1025
 #else
 #define MOD_SEGMENT_CHUNK_GROUP_COUNT 96
+#define MOD_SEGMENT_CHUNK_STORAGE_COUNT 769
 #endif
 
 static u32 mod_write_bytes(u8* out, u32 off, void* src, u32 size) {
@@ -121,6 +128,10 @@ extern s32 sBackgroundCount;
 extern BackgroundContext sBackgroundCtx;
 extern u16 sSkyboxFlags;
 extern s32 sCloudCount;
+extern void* sCloudTexture;
+extern void* sSkyboxTexture;
+extern void* sStarTexture;
+extern void* sVenueFloorTexture;
 extern s16 sBackgroundSpriteR;
 extern s16 sBackgroundSpriteG;
 extern s16 sBackgroundSpriteB;
@@ -133,7 +144,18 @@ extern GhostRacer* gFastestGhostRacer;
 extern GfxPool* gGfxPool;
 extern Racer gRacers[TOTAL_RACER_COUNT];
 extern Racer* gRacersByPosition[TOTAL_RACER_COUNT];
-extern SegmentChunk gSegmentChunks[];
+extern RacerPairInfo sRacerPairInfo[TOTAL_RACER_COUNT * (TOTAL_RACER_COUNT - 1) / 2];
+#ifndef EXPANSION_KIT
+extern SegmentChunk gSegmentChunks[MOD_SEGMENT_CHUNK_STORAGE_COUNT];
+extern EffectDrawData gEffectsDrawData[192];
+#else
+extern SegmentChunk gSegmentChunks[MOD_SEGMENT_CHUNK_STORAGE_COUNT];
+extern EffectDrawData gEffectsDrawData[2][192];
+#endif
+extern CourseDecoration gCourseDecorations[32];
+extern Effect gEffects[192];
+extern Jump gJumps[4];
+extern Landmine gLandmines[48];
 extern Vtx* gCourseVtxPtr;
 extern Vtx* gEffectsVtxEndPtr;
 extern Vtx* gEffectsVtxPtr;
@@ -151,11 +173,20 @@ extern Racer* sPlayerRacer;
 extern unk_800F8958 D_800F8958[2];
 extern unk_800F8958* D_800F89B8;
 extern unk_800F8958* D_800F89BC;
+extern s32 D_800CF500;
+extern s32 D_800CF50C;
 extern s32 D_800F89C0;
 extern SegmentChunk* D_800F89C8;
 extern SegmentChunkGroup sSegmentChunkGroups[MOD_SEGMENT_CHUNK_GROUP_COUNT];
+extern s32 D_800F892C;
+extern s16 D_800F8930[5];
+extern s32 D_800F89D4;
+extern bool D_800F89D8;
+extern s32 D_800E12C8[0x800];
 extern SegmentChunk* sWorkingSegmentChunk;
 extern SegmentChunk* sWorkingNextSegmentChunk;
+extern s32 sLastTrackShapeType;
+extern s32 sWorkingChunkJoinInfo;
 extern Vec3s sVenuePipeFogColors[40];
 extern Vec3s sVenueTunnelFogColors[40];
 extern Vec3s* sPipeFogColors;
@@ -164,6 +195,8 @@ extern Vtx* sTerrainEffectVtxStart;
 extern bool gInCourseEditor;
 extern s32 D_800DCCFC;
 extern unk_80225800 D_80225800;
+extern u8 aCloudTex[];
+extern u8 D_F2207C8[];
 extern s32 gNumPlayers;
 extern s32 gGameMode;
 extern s32 gSkyboxType;
@@ -210,13 +243,51 @@ extern RomOffset gRomSegmentPairs[][2];
 #endif
 
 extern void Racer_UpdateRivalRacer(void);
+extern void Racer_UpdateRacerPairInfo(void);
+extern void Racer_UpdateRacePositions(void);
+extern void Racer_UpdateNearestRacer(void);
 extern void Background_Init(void);
+extern void Background_InitBackgroundSprites(void);
+extern void func_80074428(s32 courseIndex);
+extern void func_80074634(CourseInfo* courseInfo);
+extern void func_80079EC8(void);
+extern void Course_GadgetsInit(s32 courseIndex);
+extern void Course_SegmentLengthsInit(CourseInfo* courseInfo);
+extern s32 Course_SegmentJoinsInit(CourseInfo* courseInfo);
+extern void Course_SegmentContinuousFlagInit(CourseInfo* courseInfo);
+extern void Course_SegmentFormsInit(CourseInfo* courseInfo);
+extern void Course_JumpsViewInteractDataInit(void);
+extern void Course_LandminesViewInteractDataInit(void);
+extern void Course_DecorationsViewInteractDataInit(void);
+extern void Course_EffectsViewInteractDataInit(bool arg0);
+extern void Course_ChunkCalculateRoadAirReferencePos(SegmentChunk*, f32, f32, Mtx3F*, Vec3f*, Vec3f*, Vec3f*, Vec3f*,
+                                                     Vec3f*);
+extern void Course_ChunkCalculateWalledRoadReferencePos(SegmentChunk*, f32, f32, Mtx3F*, Vec3f*, Vec3f*, Vec3f*,
+                                                        Vec3f*, Vec3f*);
+extern void Course_ChunkCalculatePipeReferencePos(SegmentChunk*, f32, f32, Mtx3F*, Vec3f*, Vec3f*, Vec3f*, Vec3f*,
+                                                  Vec3f*);
+extern void Course_ChunkCalculateCylinderReferencePos(SegmentChunk*, f32, f32, Mtx3F*, Vec3f*, Vec3f*, Vec3f*,
+                                                      Vec3f*, Vec3f*);
+extern void Course_ChunkCalculateHalfPipeReferencePos(SegmentChunk*, f32, f32, Mtx3F*, Vec3f*, Vec3f*, Vec3f*,
+                                                      Vec3f*, Vec3f*);
+extern void Course_ChunkCalculateTunnelReferencePos(SegmentChunk*, f32, f32, Mtx3F*, Vec3f*, Vec3f*, Vec3f*, Vec3f*,
+                                                    Vec3f*);
+extern void Course_ChunkCalculateBorderlessRoadReferencePos(SegmentChunk*, f32, f32, Mtx3F*, Vec3f*, Vec3f*, Vec3f*,
+                                                            Vec3f*, Vec3f*);
+extern void Course_ChunkJoinEqual(SegmentChunk*, SegmentChunk*, f32);
+extern void Course_ChunkJoinPipeTunnel(SegmentChunk*, SegmentChunk*, f32);
+extern void Course_ChunkJoinCylinder(SegmentChunk*, SegmentChunk*, f32);
+extern s32 func_800A1954(CourseInfo* courseInfo);
 extern void func_800A4BAC(void);
+extern void func_800A4B54(void);
+extern void func_800A4D0C(s32 arg0);
 extern void func_800747EC(s32 venue);
 extern void func_8007F4E0(s32 venue, s32 skybox);
 extern void func_8009CED0(s32 venue);
 extern uintptr_t Segment_SetAddress(s32 segment, uintptr_t addr);
 extern uintptr_t Segment_SetPhysicalAddress(s32 segment, uintptr_t addr);
+extern ModSegmentChunkCalculateReferencePosFunc sSegmentChunkCalculateReferencePosFuncs[];
+extern ModSegmentChunkJoinFunc sSegmentChunkJoinFuncs[];
 
 static u32 Mod_RoundUpToSector(u32 size) {
     return (size + SECTOR_SIZE - 1) / SECTOR_SIZE;
@@ -455,6 +526,74 @@ static void Mod_RebuildGhostPointers(void) {
     }
 }
 
+static void Mod_RebuildRacerPointers(void) {
+    CourseSegment* segments;
+    CourseSegment* segmentEnd;
+    s32 i;
+
+    if ((gCurrentCourseInfo == NULL) || (gCurrentCourseInfo->segmentCount <= 0)) {
+        return;
+    }
+
+    segments = gCurrentCourseInfo->courseSegments;
+    segmentEnd = &segments[gCurrentCourseInfo->segmentCount];
+
+    for (i = 0; i < gTotalRacers; i++) {
+        CourseSegment* segment = gRacers[i].segmentPositionInfo.courseSegment;
+        s32 segmentIndex = 0;
+
+        if ((segment >= segments) && (segment < segmentEnd)) {
+            segmentIndex = segment - segments;
+        } else if ((gRacers[i].lastSegmentIndex >= 0) &&
+                   (gRacers[i].lastSegmentIndex < gCurrentCourseInfo->segmentCount)) {
+            segmentIndex = gRacers[i].lastSegmentIndex;
+        }
+
+        gRacers[i].segmentPositionInfo.courseSegment = &segments[segmentIndex];
+        gRacers[i].unk_28C = NULL;
+        gRacers[i].racerAhead = NULL;
+        gRacers[i].racerBehind = NULL;
+    }
+
+    for (i = 0; i < ARRAY_COUNT(sRacerPairInfo); i++) {
+        sRacerPairInfo[i].leadRacer = NULL;
+        sRacerPairInfo[i].trailRacer = NULL;
+        sRacerPairInfo[i].areColliding = false;
+    }
+}
+
+static void Mod_ReprojectRacersOntoCourse(void) {
+    s32 i;
+
+    if ((gCurrentCourseInfo == NULL) || (gCurrentCourseInfo->segmentCount <= 0)) {
+        return;
+    }
+
+    for (i = 0; i < gTotalRacers; i++) {
+        Racer* racer = &gRacers[i];
+
+        if (func_8009EBEC(&racer->segmentPositionInfo, racer->segmentPositionInfo.pos.x, racer->segmentPositionInfo.pos.y,
+                          racer->segmentPositionInfo.pos.z, 100, 1.0f) != 0) {
+            continue;
+        }
+
+        racer->segmentPositionInfo.segmentLengthProportion = Course_SplineGetLengthInfo(
+            racer->segmentPositionInfo.courseSegment, racer->segmentPositionInfo.segmentTValue, &racer->lapDistance);
+        Course_SplineGetBasis(racer->segmentPositionInfo.courseSegment, racer->segmentPositionInfo.segmentTValue,
+                              &racer->segmentBasis, racer->segmentPositionInfo.segmentLengthProportion);
+
+        racer->currentRadiusLeft = (racer->segmentPositionInfo.segmentLengthProportion *
+                                    (racer->segmentPositionInfo.courseSegment->next->radiusLeft -
+                                     racer->segmentPositionInfo.courseSegment->radiusLeft)) +
+                                   racer->segmentPositionInfo.courseSegment->radiusLeft;
+        racer->currentRadiusRight = (racer->segmentPositionInfo.segmentLengthProportion *
+                                     (racer->segmentPositionInfo.courseSegment->next->radiusRight -
+                                      racer->segmentPositionInfo.courseSegment->radiusRight)) +
+                                    racer->segmentPositionInfo.courseSegment->radiusRight;
+        racer->lastSegmentIndex = racer->segmentPositionInfo.courseSegment->segmentIndex;
+    }
+}
+
 static void Mod_InitCourseChunkScratch(void) {
     D_800F8958[0].unk_04 = D_80140F0;
     D_800F8958[0].unk_08 = D_8014180;
@@ -576,6 +715,222 @@ static void Mod_ResetBackgroundState(void) {
     }
 }
 
+static void Mod_RebindBackgroundContext(void) {
+    if ((gVenueType < 0) || (gVenueType > VENUE_ENDING) || (gSkyboxType < 0) || (gSkyboxType > SKYBOX_SKY_BLUE)) {
+        return;
+    }
+
+    sBackgroundCtx.venueFloor = sCourseVenueFloors[gVenueType];
+    sBackgroundCtx.skybox = sCourseSkyboxes[gSkyboxType];
+}
+
+static void Mod_RebindBackgroundTextures(void) {
+    if ((sBackgroundCtx.venueFloor == NULL) || (sBackgroundCtx.skybox == NULL)) {
+        return;
+    }
+
+    sSkyboxTexture = func_80078104(sBackgroundCtx.skybox->texture, 64 * 1 * sizeof(u16), 0, 0, false);
+    sVenueFloorTexture = func_80078104(sBackgroundCtx.venueFloor->texture, 64 * 32 * sizeof(u16), 0, 0, false);
+    sCloudTexture = NULL;
+    sStarTexture = NULL;
+
+    if (sSkyboxFlags & SKYBOX_CLOUDY) {
+        sCloudTexture = func_80078104(aCloudTex, 64 * 32 * sizeof(u8), 0, 0, false);
+    }
+    if (sSkyboxFlags & SKYBOX_STARRY) {
+        sStarTexture = func_80078104(D_F2207C8, 8 * 8 * sizeof(u8), 0, 0, false);
+    }
+}
+
+static void Mod_RebuildBackgroundSprites(void) {
+    Background_InitBackgroundSprites();
+}
+
+static void Mod_RebuildCourseFunctionTables(void) {
+    sSegmentChunkCalculateReferencePosFuncs[0] = Course_ChunkCalculateRoadAirReferencePos;
+    sSegmentChunkCalculateReferencePosFuncs[1] = Course_ChunkCalculateWalledRoadReferencePos;
+    sSegmentChunkCalculateReferencePosFuncs[2] = Course_ChunkCalculatePipeReferencePos;
+    sSegmentChunkCalculateReferencePosFuncs[3] = Course_ChunkCalculateCylinderReferencePos;
+    sSegmentChunkCalculateReferencePosFuncs[4] = Course_ChunkCalculateHalfPipeReferencePos;
+    sSegmentChunkCalculateReferencePosFuncs[5] = Course_ChunkCalculateTunnelReferencePos;
+    sSegmentChunkCalculateReferencePosFuncs[6] = Course_ChunkCalculateRoadAirReferencePos;
+    sSegmentChunkCalculateReferencePosFuncs[7] = Course_ChunkCalculateBorderlessRoadReferencePos;
+
+    sSegmentChunkJoinFuncs[0] = Course_ChunkJoinEqual;
+    sSegmentChunkJoinFuncs[1] = Course_ChunkJoinEqual;
+    sSegmentChunkJoinFuncs[2] = Course_ChunkJoinPipeTunnel;
+    sSegmentChunkJoinFuncs[3] = Course_ChunkJoinCylinder;
+    sSegmentChunkJoinFuncs[4] = Course_ChunkJoinEqual;
+    sSegmentChunkJoinFuncs[5] = Course_ChunkJoinPipeTunnel;
+    sSegmentChunkJoinFuncs[6] = Course_ChunkJoinEqual;
+    sSegmentChunkJoinFuncs[7] = Course_ChunkJoinEqual;
+}
+
+static void Mod_RebuildCourseSegmentPointers(void) {
+    CourseSegment* segments;
+    CourseSegment* segment;
+    s32 i;
+    s32 j;
+
+    if ((gCurrentCourseInfo == NULL) || (gCurrentCourseInfo->segmentCount <= 0)) {
+        return;
+    }
+
+    func_800A4B54();
+
+    segments = gCurrentCourseInfo->courseSegments;
+    for (i = 0; i < gCurrentCourseInfo->segmentCount; i++) {
+        segment = &segments[i];
+        segment->segmentIndex = i;
+        segment->next = &segments[(i + 1) % gCurrentCourseInfo->segmentCount];
+        segment->prev = &segments[(i + gCurrentCourseInfo->segmentCount - 1) % gCurrentCourseInfo->segmentCount];
+        segment->startChunk = NULL;
+        segment->endChunk = NULL;
+        segment->jumpsStart = NULL;
+        segment->jumpsEnd = NULL;
+        segment->landminesStart = NULL;
+        segment->landminesEnd = NULL;
+        segment->effectsStart = NULL;
+        segment->effectsEnd = NULL;
+        for (j = 0; j < ARRAY_COUNT(segment->unk_5C); j++) {
+            segment->unk_5C[j] = 0;
+        }
+    }
+
+    for (i = 0; i < gSegmentChunkCount; i++) {
+        s32 segmentIndex = gSegmentChunks[i].segmentIndex;
+
+        if ((segmentIndex < 0) || (segmentIndex >= gCurrentCourseInfo->segmentCount)) {
+            continue;
+        }
+
+        segment = &segments[segmentIndex];
+        if (segment->startChunk == NULL) {
+            segment->startChunk = &gSegmentChunks[i];
+        }
+        segment->endChunk = &gSegmentChunks[i + 1];
+    }
+}
+
+static void Mod_RebuildCourseViewInteractState(void) {
+    bzero(D_800E12C8, sizeof(D_800E12C8));
+    bzero(gCourseDecorations, sizeof(gCourseDecorations));
+    bzero(gEffects, sizeof(gEffects));
+    bzero(gEffectsDrawData, sizeof(gEffectsDrawData));
+    bzero(gJumps, sizeof(gJumps));
+    bzero(gLandmines, sizeof(gLandmines));
+
+    // These buffers and pointers are rebuilt during Race_Init and are not safe to trust after a raw restore.
+    Course_LandminesViewInteractDataInit();
+    Course_JumpsViewInteractDataInit();
+    Course_DecorationsViewInteractDataInit();
+    Course_EffectsViewInteractDataInit(false);
+}
+
+static void Mod_RecomputeCourseRenderDistances(void) {
+    CourseSegment* segment;
+    s32 i;
+
+    if ((gCurrentCourseInfo == NULL) || (gCurrentCourseInfo->segmentCount <= 0)) {
+        return;
+    }
+
+    sCourseRenderOriginDistance = 900.0f;
+    segment = gCurrentCourseInfo->courseSegments;
+    for (i = 0; i < gCurrentCourseInfo->segmentCount; i++, segment = segment->next) {
+        if (sCourseRenderOriginDistance < segment->radiusLeft) {
+            sCourseRenderOriginDistance = segment->radiusLeft;
+        }
+        if (sCourseRenderOriginDistance < segment->radiusRight) {
+            sCourseRenderOriginDistance = segment->radiusRight;
+        }
+    }
+    sCourseRenderOriginDistance += 100.0f;
+    sCourseFarRenderDistance = sCourseRenderOriginDistance + 4500.0f;
+    D_800F894C += sCourseRenderOriginDistance - 1000.0f;
+    D_800F8950 += sCourseRenderOriginDistance - 1000.0f;
+}
+
+static bool Mod_SavedCourseRuntimeLooksSane(void) {
+    s32 i;
+
+    if ((gCurrentCourseInfo == NULL) || (gCurrentCourseInfo->segmentCount <= 0) || (gCurrentCourseInfo->segmentCount > 64)) {
+        return false;
+    }
+
+    if ((gSegmentChunkCount <= 0) || (gSegmentChunkCount >= MOD_SEGMENT_CHUNK_STORAGE_COUNT)) {
+        return false;
+    }
+
+    for (i = 0; i < gSegmentChunkCount; i++) {
+        if ((gSegmentChunks[i].segmentIndex < 0) || (gSegmentChunks[i].segmentIndex >= gCurrentCourseInfo->segmentCount)) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+static void Mod_RegenerateCourseRuntimeStateFromCourseData(void) {
+    // Fall back to a full rebuild when the saved runtime course state is clearly invalid.
+    bzero(gSegmentChunks, sizeof(gSegmentChunks));
+    bzero(&D_802C2020, sizeof(D_802C2020));
+    bzero(&D_802CDFD8, sizeof(D_802CDFD8));
+    gSegmentChunkCount = 0;
+    sLastSegmentChunk = NULL;
+
+    if (!gInCourseEditor) {
+        func_80074428(gCourseIndex);
+        func_80074634(gCurrentCourseInfo);
+        Course_SplineCalculateTensions(gCurrentCourseInfo);
+        Course_SegmentsInit();
+    }
+
+    Mod_RebuildCourseSegmentPointers();
+    Course_SegmentLengthsInit(gCurrentCourseInfo);
+    Course_GadgetsInit(gCourseIndex);
+    Course_SegmentJoinsInit(gCurrentCourseInfo);
+    Course_SegmentContinuousFlagInit(gCurrentCourseInfo);
+    Course_SegmentFormsInit(gCurrentCourseInfo);
+    func_800A1954(gCurrentCourseInfo);
+}
+
+static void Mod_RebuildCourseRuntimeState(void) {
+    if ((gCurrentCourseInfo == NULL) || (gCurrentCourseInfo->segmentCount <= 0)) {
+        sLastSegmentChunk = NULL;
+        return;
+    }
+
+    D_800CF500 = 0;
+    D_800CF50C = 0;
+    sLastTrackShapeType = -1;
+    D_800F892C = -1;
+    bzero(D_800F8930, sizeof(D_800F8930));
+    D_800F89D4 = 0;
+    D_800F89D8 = true;
+    sWorkingChunkJoinInfo = 0;
+
+    func_800A4D0C((gNumPlayers >= 3) ? 2 : 1);
+    Mod_RebuildCourseFunctionTables();
+
+    if (Mod_SavedCourseRuntimeLooksSane()) {
+        // Prefer the saved runtime chunk table when it survives restore. It matches the
+        // original in-race geometry more closely than regenerating from saved CourseData.
+        Mod_RebuildCourseSegmentPointers();
+    } else {
+        Mod_RegenerateCourseRuntimeStateFromCourseData();
+    }
+
+    Mod_RecomputeCourseRenderDistances();
+
+    if (gSegmentChunkCount > 0) {
+        sLastSegmentChunk = &gSegmentChunks[gSegmentChunkCount];
+        gSegmentChunks[gSegmentChunkCount] = gSegmentChunks[0];
+    } else {
+        sLastSegmentChunk = NULL;
+    }
+}
+
 static void Mod_RebindSegmentTable(void) {
     Segment_SetAddress(0, 0);
     Segment_SetPhysicalAddress(1, gGfxPool);
@@ -683,16 +1038,6 @@ static void Mod_PostLoadFixups(void) {
         sLastRacer = NULL;
     }
 
-    if (gSegmentChunkCount > 0) {
-        sLastSegmentChunk = &gSegmentChunks[gSegmentChunkCount];
-    } else {
-        sLastSegmentChunk = NULL;
-    }
-
-    sPlayerRacer = gRacers;
-    Mod_RebuildRaceOrder();
-    Racer_UpdateRivalRacer();
-
     if (sGhostReplayRecordingSize < 0) {
         sGhostReplayRecordingSize = 0;
     } else if (sGhostReplayRecordingSize > ARRAY_COUNT(sGhostReplayRecordingBuffer)) {
@@ -704,8 +1049,8 @@ static void Mod_PostLoadFixups(void) {
 
     if (gCurrentCourseInfo != NULL) {
         func_8007F4E0(COURSE_CONTEXT()->courseData.venue, COURSE_CONTEXT()->courseData.skybox);
-        func_8009CED0(COURSE_CONTEXT()->courseData.venue);
         func_800747EC(COURSE_CONTEXT()->courseData.venue);
+        func_8009CED0(COURSE_CONTEXT()->courseData.venue);
     }
     Mod_RearmGraphicsAssetLoads();
 
@@ -717,9 +1062,7 @@ static void Mod_PostLoadFixups(void) {
         sTunnelFogColors = NULL;
     }
 
-    if (gCurrentCourseInfo != NULL) {
-        Background_Init();
-    } else {
+    if (gCurrentCourseInfo == NULL) {
         Mod_ResetBackgroundState();
     }
 
@@ -737,6 +1080,30 @@ static void Mod_PostLoadFixups(void) {
 #else
     sTerrainEffectVtxStart = D_80225800.terrainEffectVtx;
 #endif
+
+    if (gCurrentCourseInfo != NULL) {
+        func_80079EC8();
+        gCourseFeaturesInfo.features = gCourseFeatures;
+        gCourseEffectsInfo.effects = gCourseEffects;
+        Mod_RebuildCourseRuntimeState();
+        Background_Init();
+        Hud_ReloadAssets();
+        Menus_ReloadAssets();
+        Mod_RebuildCourseViewInteractState();
+    } else {
+        sLastSegmentChunk = NULL;
+    }
+
+    sPlayerRacer = gRacers;
+    Mod_RebuildRacerPointers();
+    Mod_ReprojectRacersOntoCourse();
+    if ((gCurrentCourseInfo != NULL) && (gTotalRacers > 0)) {
+        Racer_UpdateRacerPairInfo();
+        Racer_UpdateRacePositions();
+        Racer_UpdateNearestRacer();
+    }
+    Mod_RebuildRaceOrder();
+    Racer_UpdateRivalRacer();
 }
 
 static void WriteRegionToSD(const void* src_, u32 size, u32* io_lba)
