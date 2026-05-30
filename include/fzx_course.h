@@ -155,6 +155,7 @@ typedef enum CourseFeatures {
 } CourseFeatures;
 
 #define COURSE_FEATURE_IS_BUILDING(feature) (((feature) >= COURSE_FEATURE_BUILDING_TALL_LEFT) && ((feature) <= COURSE_FEATURE_BUILDING_TALL_GOLD_RIGHT))
+#define COURSE_FEATURE_IS_SIGN(feature) (((feature) == COURSE_FEATURE_SIGN_TV_LEFT) || ((feature) == COURSE_FEATURE_SIGN_TV_RIGHT) || ((feature) == COURSE_FEATURE_SIGN_1_RIGHT) || ((feature) == COURSE_FEATURE_SIGN_2_RIGHT) || ((feature) == COURSE_FEATURE_SIGN_1_LEFT) || ((feature) == COURSE_FEATURE_SIGN_2_LEFT) || ((feature) == COURSE_FEATURE_SIGN_NINTEX_RIGHT) || ((feature) == COURSE_FEATURE_SIGN_NINTEX_LEFT) || ((feature) == COURSE_FEATURE_SIGN_OVERHEAD))
 
 typedef enum PitZone {
     /* -1 */ PIT_NONE = -1,

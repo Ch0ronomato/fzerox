@@ -55,7 +55,12 @@ u16* gCourseEditIconTextures[] = {
 };
 #endif
 
+Gfx* Course_FeatureDrawVoid(Gfx* ret) 
+{ 
+  return ret;
+}
 Gfx* (*sCourseDecorationDrawFuncs[])(Gfx*) = {
+#if 0
     Course_FeatureDrawGateSquare,       // COURSE_FEATURE_GATE_SQUARE
     Course_FeatureDrawGateStart,        // COURSE_FEATURE_GATE_START
     Course_FeatureDrawGateHexagonal,    // COURSE_FEATURE_GATE_HEXAGONAL
@@ -67,6 +72,29 @@ Gfx* (*sCourseDecorationDrawFuncs[])(Gfx*) = {
     Course_FeatureDrawSign1,            // COURSE_FEATURE_SIGN_1_LEFT
     Course_FeatureDrawSignNinTexRight,  // COURSE_FEATURE_SIGN_NINTEX_RIGHT
     Course_FeatureDrawSignNinTexLeft,   // COURSE_FEATURE_SIGN_NINTEX_LEFT
+    Course_FeatureDrawSignOverhead,     // COURSE_FEATURE_SIGN_OVERHEAD
+    Course_FeatureDrawBuildingTall,     // COURSE_FEATURE_BUILDING_TALL_LEFT
+    Course_FeatureDrawBuildingTall,     // COURSE_FEATURE_BUILDING_TALL_RIGHT
+    Course_FeatureDrawBuildingShort,    // COURSE_FEATURE_BUILDING_SHORT_LEFT
+    Course_FeatureDrawBuildingShort,    // COURSE_FEATURE_BUILDING_SHORT_RIGHT
+    Course_FeatureDrawBuildingSpire,    // COURSE_FEATURE_BUILDING_SPIRE_LEFT
+    Course_FeatureDrawBuildingSpire,    // COURSE_FEATURE_BUILDING_SPIRE_RIGHT
+    Course_FeatureDrawBuildingMountain, // COURSE_FEATURE_BUILDING_MOUNTAIN_LEFT
+    Course_FeatureDrawBuildingMountain, // COURSE_FEATURE_BUILDING_MOUNTAIN_RIGHT
+    Course_FeatureDrawBuildingTallGold, // COURSE_FEATURE_BUILDING_TALL_GOLD_LEFT
+    Course_FeatureDrawBuildingTallGold, // COURSE_FEATURE_BUILDING_TALL_GOLD_RIGHT
+#endif
+    Course_FeatureDrawGateSquare,       // COURSE_FEATURE_GATE_SQUARE
+    Course_FeatureDrawGateStart,        // COURSE_FEATURE_GATE_START
+    Course_FeatureDrawGateHexagonal,    // COURSE_FEATURE_GATE_HEXAGONAL
+    Course_FeatureDrawSignTV,           // COURSE_FEATURE_SIGN_TV_RIGHT
+    Course_FeatureDrawSignTV,           // COURSE_FEATURE_SIGN_TV_LEFT
+    Course_FeatureDrawSign2,            // COURSE_FEATURE_SIGN_2_RIGHT
+    Course_FeatureDrawSign2,            // COURSE_FEATURE_SIGN_2_LEFT
+    Course_FeatureDrawSign1,            // COURSE_FEATURE_SIGN_1_RIGHT
+    Course_FeatureDrawSign1,            // COURSE_FEATURE_SIGN_1_LEFT
+    Course_FeatureDrawVoid,
+    Course_FeatureDrawVoid,
     Course_FeatureDrawSignOverhead,     // COURSE_FEATURE_SIGN_OVERHEAD
     Course_FeatureDrawBuildingTall,     // COURSE_FEATURE_BUILDING_TALL_LEFT
     Course_FeatureDrawBuildingTall,     // COURSE_FEATURE_BUILDING_TALL_RIGHT
@@ -250,7 +278,6 @@ extern s32 D_800DCCFC;
 #define VERTEX_MODIFIED_ST(s, t) ((((s) << 15) & 0xFFFF0000) | ((t) &0xFFFF))
 #define VERTEX_MODIFIED_ST2(s, t) ((((s) << 16) & 0xFFFF0000) | ((t) &0xFFFF))
 
-#if !defined(EXPANSION_KIT) || defined(NON_MATCHING)
 // Draw Course Effects and Features
 Gfx* Course_GadgetsDraw(Gfx* gfx, s32 arg1) {
     s32 i;
@@ -276,7 +303,6 @@ Gfx* Course_GadgetsDraw(Gfx* gfx, s32 arg1) {
     EffectDrawData* effectDrawData;
     EffectDrawData* effectDrawDataEnd; // sp1A0
     s32 temp_t0;
-
     gSPDisplayList(gfx++, aSetupLandmineTextureDL);
 
 #ifdef EXPANSION_KIT
@@ -613,6 +639,7 @@ Gfx* Course_GadgetsDraw(Gfx* gfx, s32 arg1) {
         }
 #endif
     } else {
+#if 1
         featuresEnd = featuresInfo->features + featuresInfo->featureCount;
         decorationMtx = D_80225800.decorationMtx;
         for (feature = featuresInfo->features; feature < featuresEnd; feature++) {
@@ -649,12 +676,10 @@ Gfx* Course_GadgetsDraw(Gfx* gfx, s32 arg1) {
             decorationMtx++;
             decoration++;
         }
+#endif
     }
     return gfx;
 }
-#else
-#pragma GLOBAL_ASM("asm/jp/ek/nonmatchings/game/course_gadgets/Course_GadgetsDraw.s")
-#endif
 
 void Course_JumpsViewInteractDataInit(void) {
     CourseFeaturesInfo* featuresInfo = &gCourseFeaturesInfo;

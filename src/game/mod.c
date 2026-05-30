@@ -1031,6 +1031,9 @@ static void Mod_PostLoadFixups(void) {
     gCourseVtxPtr = gGfxPool->courseVtxBuffer;
     gEffectsVtxPtr = gGfxPool->effectsVtxBuffer;
     gEffectsVtxEndPtr = &gGfxPool->effectsVtxBuffer[0x7FF];
+    // The NinTex sign draw path consumes animated matrices from the current gfx pool.
+    // Rebuild them here so a restore does not rely on the next update tick running first.
+    // func_80074844();
 
     if ((gTotalRacers > 0) && (gTotalRacers <= TOTAL_RACER_COUNT)) {
         sLastRacer = &gRacers[gTotalRacers - 1];
@@ -1086,6 +1089,8 @@ static void Mod_PostLoadFixups(void) {
         gCourseFeaturesInfo.features = gCourseFeatures;
         gCourseEffectsInfo.effects = gCourseEffects;
         Mod_RebuildCourseRuntimeState();
+        // Rebuild gadget descriptors from course data instead of trusting raw restored arrays.
+        // Course_GadgetsInit(gCourseIndex);
         Background_Init();
         Hud_ReloadAssets();
         Menus_ReloadAssets();
