@@ -95,7 +95,7 @@ Gfx* (*sCourseDecorationDrawFuncs[])(Gfx*) = {
     Course_FeatureDrawSign1,            // COURSE_FEATURE_SIGN_1_LEFT
     Course_FeatureDrawVoid,
     Course_FeatureDrawVoid,
-    Course_FeatureDrawSignOverhead,     // COURSE_FEATURE_SIGN_OVERHEAD
+    Course_FeatureDrawVoid,     // COURSE_FEATURE_SIGN_OVERHEAD
     Course_FeatureDrawBuildingTall,     // COURSE_FEATURE_BUILDING_TALL_LEFT
     Course_FeatureDrawBuildingTall,     // COURSE_FEATURE_BUILDING_TALL_RIGHT
     Course_FeatureDrawBuildingShort,    // COURSE_FEATURE_BUILDING_SHORT_LEFT
